@@ -55,12 +55,12 @@ const AVATARS = [
 
 
 // Animated Hero Header Component
-const AnimatedHeroHeader = ({ scrollY }) => {
+const AnimatedHeroHeader = ({ scrollY, animationProgress }) => {
   const animatedStyle = useAnimatedStyle(() => {
     const height = interpolate(
-      scrollY.value,
-      [0, SCROLL_ANIMATION_RANGE],
-      [172, 120], // Decreased by 8pt each to reduce spacing to 8pt
+      animationProgress.value,
+      [0, 1],
+      [172, 120], // Based on direction-based progress
       Extrapolate.CLAMP
     );
 
@@ -100,42 +100,33 @@ const AnimatedHeroHeader = ({ scrollY }) => {
   });
 
   const titleStyle = useAnimatedStyle(() => {
-    const progress = interpolate(
-      scrollY.value,
-      [0, SCROLL_ANIMATION_RANGE * 0.4], // Title shrinks earlier and faster
-      [0, 1],
-      Extrapolate.CLAMP
-    );
-
     const fontSize = interpolate(
-      progress,
-      [0, 1],
-      [24, 18],
+      animationProgress.value,
+      [0, 0.4, 1], // Quick transition early in animation
+      [24, 18, 18],
       Extrapolate.CLAMP
     );
 
     return {
       fontSize: withTiming(fontSize, {
-        duration: 150, // Faster duration
+        duration: 150,
         easing: Easing.bezier(0.4, 0.0, 0.2, 1),
       }),
     };
   });
 
   const avatarsStyle = useAnimatedStyle(() => {
-    // Sync vertical movement timing with invite button (full scroll range)
     const translateY = interpolate(
-      scrollY.value,
-      [0, SCROLL_ANIMATION_RANGE], // Same timing as invite button
-      [0, -52], // Same distance as invite button for synchronized movement
+      animationProgress.value,
+      [0, 1],
+      [0, -52], // Synchronized movement
       Extrapolate.CLAMP
     );
 
-    // Immediate fade out (faster timing)
     const opacity = interpolate(
-      scrollY.value,
-      [0, SCROLL_ANIMATION_RANGE * 0.3], // Quick fade in first 30% of scroll
-      [1, 0],
+      animationProgress.value,
+      [0, 0.3, 1], // Quick fade in first 30%
+      [1, 0, 0],
       Extrapolate.CLAMP
     );
 
@@ -151,8 +142,8 @@ const AnimatedHeroHeader = ({ scrollY }) => {
 
   const inviteButtonPositionStyle = useAnimatedStyle(() => {
     const translateY = interpolate(
-      scrollY.value,
-      [0, SCROLL_ANIMATION_RANGE],
+      animationProgress.value,
+      [0, 1],
       [0, -52], // Move up to align with hamburger menu center
       Extrapolate.CLAMP
     );
@@ -262,16 +253,30 @@ const BottomNavigation = () => (
 // Main Component
 export default function HeroHeaderAnimation() {
   const scrollY = useSharedValue(0);
+  const animationProgress = useSharedValue(0);
   const flatListRef = useRef(null);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
-      // Now scrollY increases as user scrolls down (normal direction)
-      scrollY.value = event.contentOffset.y;
+      const currentY = event.contentOffset.y;
+      const lastY = scrollY.value;
+      scrollY.value = currentY;
+
+      // Determine scroll direction
+      const direction = currentY > lastY ? 1 : -1; // 1 = down, -1 = up
+
+      // Update animation progress based on direction
+      if (direction > 0) {
+        // Scrolling down - expand animation
+        animationProgress.value = Math.min(1, animationProgress.value + 0.05);
+      } else {
+        // Scrolling up - contract animation
+        animationProgress.value = Math.max(0, animationProgress.value - 0.08);
+      }
     },
     onMomentumEnd: () => {
       // Provide haptic feedback at key transition points
-      if (scrollY.value > SCROLL_ANIMATION_RANGE * 0.8 && scrollY.value < SCROLL_ANIMATION_RANGE * 1.2) {
+      if (animationProgress.value > 0.8) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
     },
@@ -303,7 +308,7 @@ export default function HeroHeaderAnimation() {
       <StatusBar barStyle="light-content" />
 
       {/* Animated Hero Header */}
-      <AnimatedHeroHeader scrollY={scrollY} />
+      <AnimatedHeroHeader scrollY={scrollY} animationProgress={animationProgress} />
 
       {/* Photo Grid */}
       <Animated.FlatList
