@@ -256,31 +256,25 @@ export default function HeroHeaderAnimation() {
   const animationProgress = useSharedValue(0);
   const flatListRef = useRef(null);
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      const currentY = event.contentOffset.y;
-      const lastY = scrollY.value;
+  const handleScroll = useCallback((event) => {
+    const currentY = event.nativeEvent.contentOffset.y;
+
+    // Simple bounds checking
+    if (currentY >= 0 && currentY < 5000) {
       scrollY.value = currentY;
 
-      // Determine scroll direction
-      const direction = currentY > lastY ? 1 : -1; // 1 = down, -1 = up
+      // Simple position-based animation
+      const maxScroll = 200;
+      const newProgress = Math.min(1, Math.max(0, currentY / maxScroll));
+      animationProgress.value = newProgress;
+    }
+  }, [scrollY, animationProgress]);
 
-      // Update animation progress based on direction
-      if (direction > 0) {
-        // Scrolling down - expand animation
-        animationProgress.value = Math.min(1, animationProgress.value + 0.05);
-      } else {
-        // Scrolling up - contract animation
-        animationProgress.value = Math.max(0, animationProgress.value - 0.08);
-      }
-    },
-    onMomentumEnd: () => {
-      // Provide haptic feedback at key transition points
-      if (animationProgress.value > 0.8) {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      }
-    },
-  });
+  const handleScrollEndDrag = useCallback(() => {
+    if (animationProgress.value > 0.8) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  }, [animationProgress]);
 
   const renderImage = useCallback(({ item }) => {
     return (
@@ -317,18 +311,21 @@ export default function HeroHeaderAnimation() {
         renderItem={renderImage}
         keyExtractor={keyExtractor}
         numColumns={3}
-        onScroll={scrollHandler}
+        onScroll={handleScroll}
+        onScrollEndDrag={handleScrollEndDrag}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={headerComponent}
         ListFooterComponent={footerComponent}
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={12}
-        windowSize={5}
-        initialNumToRender={12}
+        removeClippedSubviews={false}
+        maxToRenderPerBatch={15}
+        windowSize={10}
+        initialNumToRender={15}
         contentContainerStyle={styles.gridContent}
         columnWrapperStyle={styles.row}
         inverted={false}
+        bounces={true}
+        bouncesZoom={false}
         contentInsetAdjustmentBehavior="never"
       />
 
