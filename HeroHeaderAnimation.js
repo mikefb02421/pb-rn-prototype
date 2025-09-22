@@ -57,8 +57,16 @@ const AVATARS = [
 // Animated Hero Header Component
 const AnimatedHeroHeader = ({ scrollY }) => {
   const animatedStyle = useAnimatedStyle(() => {
-    // Remove fixed height constraint - let content determine size
-    return {};
+    const height = interpolate(
+      scrollY.value,
+      [0, SCROLL_ANIMATION_RANGE],
+      [172, 120], // Decreased by 8pt each to reduce spacing to 8pt
+      Extrapolate.CLAMP
+    );
+
+    return {
+      height,
+    };
   });
 
   const backgroundStyle = useAnimatedStyle(() => {
@@ -94,7 +102,7 @@ const AnimatedHeroHeader = ({ scrollY }) => {
   const titleStyle = useAnimatedStyle(() => {
     const progress = interpolate(
       scrollY.value,
-      [0, SCROLL_ANIMATION_RANGE],
+      [0, SCROLL_ANIMATION_RANGE * 0.4], // Title shrinks earlier and faster
       [0, 1],
       Extrapolate.CLAMP
     );
@@ -108,7 +116,7 @@ const AnimatedHeroHeader = ({ scrollY }) => {
 
     return {
       fontSize: withTiming(fontSize, {
-        duration: 250,
+        duration: 150, // Faster duration
         easing: Easing.bezier(0.4, 0.0, 0.2, 1),
       }),
     };
@@ -156,7 +164,7 @@ const AnimatedHeroHeader = ({ scrollY }) => {
     const translateY = interpolate(
       scrollY.value,
       [0, SCROLL_ANIMATION_RANGE],
-      [0, -52], // Move up to perfectly align with hamburger menu center
+      [0, -52], // Move up to align with hamburger menu center
       Extrapolate.CLAMP
     );
 
@@ -234,6 +242,7 @@ const AnimatedHeroHeader = ({ scrollY }) => {
             <Text style={styles.inviteText}>Invite</Text>
           </View>
         </Animated.View>
+
       </View>
     </Animated.View>
   );
@@ -390,7 +399,7 @@ const styles = StyleSheet.create({
   menuIconContainer: {
     marginRight: 8,
     height: 36,
-    width: 36,
+    width: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -428,6 +437,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 16,
     bottom: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avatarsContainer: {
     flexDirection: 'row',
