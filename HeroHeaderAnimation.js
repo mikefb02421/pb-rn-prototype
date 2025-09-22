@@ -123,38 +123,27 @@ const AnimatedHeroHeader = ({ scrollY }) => {
   });
 
   const avatarsStyle = useAnimatedStyle(() => {
-    const progress = interpolate(
+    // Sync vertical movement timing with invite button (full scroll range)
+    const translateY = interpolate(
       scrollY.value,
-      [0, SCROLL_ANIMATION_RANGE * 0.7],
-      [0, 1],
+      [0, SCROLL_ANIMATION_RANGE], // Same timing as invite button
+      [0, -52], // Same distance as invite button for synchronized movement
       Extrapolate.CLAMP
     );
 
+    // Immediate fade out (faster timing)
     const opacity = interpolate(
-      progress,
-      [0, 1],
+      scrollY.value,
+      [0, SCROLL_ANIMATION_RANGE * 0.3], // Quick fade in first 30% of scroll
       [1, 0],
       Extrapolate.CLAMP
     );
 
-    const scale = interpolate(
-      progress,
-      [0, 1],
-      [1, 0.8],
-      Extrapolate.CLAMP
-    );
-
     return {
-      opacity: withTiming(opacity, {
-        duration: 200,
-        easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-      }),
+      opacity,
       transform: [
         {
-          scale: withTiming(scale, {
-            duration: 200,
-            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-          }),
+          translateY,
         },
       ],
     };
