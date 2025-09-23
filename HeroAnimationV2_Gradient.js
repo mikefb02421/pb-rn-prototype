@@ -60,18 +60,11 @@ const AVATARS = [
 // Animated Hero Header Component V2
 const AnimatedHeroHeaderV2 = ({ animationProgress }) => {
 
-  // Hero container height - changes during scroll
+  // Hero container height - stays constant
   const heroStyle = useAnimatedStyle(() => {
-    const height = interpolate(
-      animationProgress.value,
-      [0, 1],
-      [150, 100], // Smaller when scrolled
-      Extrapolate.CLAMP
-    );
-
     // Use transparent background so gradient shows through to images
     return {
-      height,
+      height: 180, // Fixed height in both states
       backgroundColor: 'transparent'
     };
   });
@@ -221,6 +214,9 @@ const AnimatedHeroHeaderV2 = ({ animationProgress }) => {
           </View>
         </View>
 
+        {/* Fixed Spacer */}
+        <View style={{ height: 16 }} />
+
         {/* Middle Row - Search Bar and Avatars */}
         <View style={styles.middleRow}>
           {/* Search Bar */}
@@ -309,7 +305,7 @@ export default function HeroAnimationV2() {
   const keyExtractor = useCallback((item) => item.id, []);
 
   const headerComponent = useMemo(() => (
-    <View style={{ height: 160 }} />
+    <View style={{ height: 190 }} />
   ), []);
 
   const footerComponent = useMemo(() => (
@@ -373,7 +369,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
+    height: '100%',
   },
   heroSemiBackground: {
     position: 'absolute',
@@ -394,13 +390,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     paddingBottom: 8,
   },
 
   // Title Row
   titleRow: {
-    marginBottom: 16,
+    marginBottom: 0,
   },
   titleContainer: {
     flexDirection: 'row',

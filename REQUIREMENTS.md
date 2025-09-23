@@ -19,6 +19,28 @@ Each page utilizes gesture-based layers for maximum functionality:
 - **Default View**: Primary content and interactions
 - **Pull Up**: Related content and advanced features
 
+## Hero Animation Requirements
+
+### Animation Specifications
+- **Scroll-based animation**: Progress from 0 to 1 over 300px scroll distance
+- **Hero height transition**: 150px (default) → 100px (scrolled)
+- **Background image**: Fades out (opacity 1 → 0)
+- **Title text**: Fades out completely
+- **Avatars**: Slide right 100px and fade out
+- **Search bar**:
+  - Slides right 56px (44px hamburger + 12px gap)
+  - Moves up 60px to align with hamburger
+  - Expands width from 200px to screenWidth - 144px
+- **Invite button**: Moves up 60px to align with hamburger
+- **Gradient overlay**: Fades in with transparent gradient using expo-linear-gradient
+
+### UI Element Specifications
+- **All interactive elements**: 44pt height for consistency
+- **Hamburger menu icon**: 36px size for visual balance
+- **Gaps in scrolled state**: 12pt between hamburger/search/invite
+- **Avatar spacing**: 52px right margin to prevent invite button overlap
+- **Gradient colors**: rgba(0,0,0,0.6) → rgba(0,0,0,0.3) → rgba(0,0,0,0.1) → transparent
+
 ## Page-by-Page Requirements
 
 ### 🔍 Search Page
