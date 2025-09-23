@@ -103,7 +103,7 @@ const AnimatedHeroHeader = ({ scrollY, animationProgress }) => {
     const fontSize = interpolate(
       animationProgress.value,
       [0, 0.4, 1], // Quick transition early in animation
-      [24, 18, 18],
+      [24, 20, 20], // Changed from 18 to 20pt for scrolled state
       Extrapolate.CLAMP
     );
 
