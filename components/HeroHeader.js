@@ -1,54 +1,23 @@
-// Hero Animation V2 with Gradient - Copy this file to snack.expo.dev
-//
-// IMPORTANT: In Expo Snack, if you get an error about expo-linear-gradient:
-// 1. Try refreshing the Snack page
-// 2. Or add "expo-linear-gradient": "~13.0.2" to dependencies in package.json
-// 3. The library should auto-install when you import it
-//
-// If it still doesn't work, use HeroAnimationV2_Final.js which has a fallback gradient
-import React, { useRef, useCallback, useMemo } from 'react';
+// HeroHeader.js - Standalone Hero Header Component
+import React from 'react';
 import {
   View,
-  Text,
   Image,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
-  StatusBar,
   Platform,
   TextInput,
+  Dimensions,
 } from 'react-native';
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
-  useAnimatedScrollHandler,
   interpolate,
   Extrapolate,
 } from 'react-native-reanimated';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width: screenWidth } = Dimensions.get('window');
-const IMAGE_SIZE = (screenWidth - 4) / 3; // 2px gaps between images
-
-// Create animated version of LinearGradient
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
-
-// Generate mountain biking themed images
-const generateMTBImages = () => {
-  const images = [];
-  for (let i = 0; i < 50; i++) {
-    images.push({
-      id: i.toString(),
-      uri: `https://picsum.photos/400/400?random=${i}`,
-    });
-  }
-  return images;
-};
-
-const IMAGES_DATA = generateMTBImages();
 
 // Avatar data with placeholder images
 const AVATARS = [
@@ -57,14 +26,11 @@ const AVATARS = [
   { id: '3', uri: 'https://i.pravatar.cc/150?img=13' },
 ];
 
-// Animated Hero Header Component V2
-const AnimatedHeroHeaderV2 = ({ animationProgress }) => {
-
+const HeroHeader = ({ animationProgress }) => {
   // Hero container height - stays constant
   const heroStyle = useAnimatedStyle(() => {
-    // Use transparent background so gradient shows through to images
     return {
-      height: 180, // Fixed height in both states
+      height: 168, // Reduced by 12px (8pt spacer + 4pt padding reduction)
       backgroundColor: 'transparent'
     };
   });
@@ -75,18 +41,6 @@ const AnimatedHeroHeaderV2 = ({ animationProgress }) => {
       animationProgress.value,
       [0, 1],
       [1, 0],
-      Extrapolate.CLAMP
-    );
-
-    return { opacity };
-  });
-
-  // Gradient overlay that appears when image fades
-  const gradientStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      animationProgress.value,
-      [0, 1],
-      [0, 1],
       Extrapolate.CLAMP
     );
 
@@ -105,11 +59,11 @@ const AnimatedHeroHeaderV2 = ({ animationProgress }) => {
     return { opacity };
   });
 
-  // Avatar stack disappear
+  // Avatar stack disappear - slide up and right
   const avatarsStyle = useAnimatedStyle(() => {
     const opacity = interpolate(
       animationProgress.value,
-      [0, 1],
+      [0, 0.5], // Fade out by halfway point
       [1, 0],
       Extrapolate.CLAMP
     );
@@ -121,15 +75,21 @@ const AnimatedHeroHeaderV2 = ({ animationProgress }) => {
       Extrapolate.CLAMP
     );
 
+    const translateY = interpolate(
+      animationProgress.value,
+      [0, 1],
+      [0, -60], // Move up to match other elements
+      Extrapolate.CLAMP
+    );
+
     return {
       opacity,
-      transform: [{ translateX }],
+      transform: [{ translateX }, { translateY }],
     };
   });
 
   // Search bar container animation - position and width
   const searchBarContainerStyle = useAnimatedStyle(() => {
-    // Move right to make space after hamburger
     const translateX = interpolate(
       animationProgress.value,
       [0, 1],
@@ -137,7 +97,6 @@ const AnimatedHeroHeaderV2 = ({ animationProgress }) => {
       Extrapolate.CLAMP
     );
 
-    // Move up to align with title row
     const translateY = interpolate(
       animationProgress.value,
       [0, 1],
@@ -145,12 +104,10 @@ const AnimatedHeroHeaderV2 = ({ animationProgress }) => {
       Extrapolate.CLAMP
     );
 
-    // Expand width to fill available space with 12pt gaps
-    // Final width: screenWidth - padding(32) - hamburger(44) - gaps(24) - invite(44) = screenWidth - 144
     const width = interpolate(
       animationProgress.value,
       [0, 1],
-      [200, screenWidth - 144], // Start at default width, expand to fill
+      [200, screenWidth - 32 - 44 - 12 - 44 - 8], // Screen - padding - hamburger - gap - invite - gap
       Extrapolate.CLAMP
     );
 
@@ -162,7 +119,6 @@ const AnimatedHeroHeaderV2 = ({ animationProgress }) => {
 
   // Invite button slides up
   const inviteButtonStyle = useAnimatedStyle(() => {
-    // Same vertical movement as search bar to align with hamburger
     const translateY = interpolate(
       animationProgress.value,
       [0, 1],
@@ -184,22 +140,6 @@ const AnimatedHeroHeaderV2 = ({ animationProgress }) => {
         resizeMode="cover"
       />
 
-      {/* Semi-transparent background for when image is gone */}
-      <Animated.View style={[styles.heroSemiBackground, gradientStyle]} />
-
-      {/* Gradient Overlay - Clean gradient that appears when image fades */}
-      <AnimatedLinearGradient
-        colors={[
-          'rgba(0, 0, 0, 0.6)',  // Semi-dark at top
-          'rgba(0, 0, 0, 0.3)',  // Medium
-          'rgba(0, 0, 0, 0.1)',  // Light
-          'transparent'          // Transparent at bottom
-        ]}
-        locations={[0, 0.3, 0.6, 1]}
-        style={[styles.gradientOverlay, gradientStyle]}
-        pointerEvents="none"
-      />
-
       {/* Content Container */}
       <View style={styles.heroContent}>
         {/* Top Row - Hamburger Menu and Title */}
@@ -215,17 +155,17 @@ const AnimatedHeroHeaderV2 = ({ animationProgress }) => {
         </View>
 
         {/* Fixed Spacer */}
-        <View style={{ height: 16 }} />
+        <View style={{ height: 8 }} />
 
         {/* Middle Row - Search Bar and Avatars */}
         <View style={styles.middleRow}>
           {/* Search Bar */}
           <Animated.View style={[styles.searchBarContainer, searchBarContainerStyle]}>
             <View style={styles.searchBar}>
-              <Ionicons name="hardware-chip" size={16} color="#007AFF" style={styles.searchIcon} />
+              <Ionicons name="search" size={16} color="#007AFF" style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
-                placeholder="AI powered photo assistant..."
+                placeholder="Search MTB Crew!"
                 placeholderTextColor="#8E8E93"
                 editable={false}
               />
@@ -264,96 +204,7 @@ const AnimatedHeroHeaderV2 = ({ animationProgress }) => {
   );
 };
 
-// Main Component
-export default function HeroAnimationV2() {
-  const scrollY = useSharedValue(0);
-  const animationProgress = useSharedValue(0);
-  const flatListRef = useRef(null);
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      const currentY = event.contentOffset.y;
-
-      if (currentY >= 0 && currentY < 5000) {
-        scrollY.value = currentY;
-
-        // Animation completes after 300px of scroll
-        const maxScroll = 300;
-        const newProgress = Math.min(1, Math.max(0, currentY / maxScroll));
-        animationProgress.value = newProgress;
-      }
-    },
-  });
-
-  const handleScrollEndDrag = useCallback(() => {
-    if (animationProgress.value > 0.8) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-  }, [animationProgress]);
-
-  const renderImage = useCallback(({ item }) => {
-    return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
-      >
-        <Image source={{ uri: item.uri }} style={styles.gridImage} />
-      </TouchableOpacity>
-    );
-  }, []);
-
-  const keyExtractor = useCallback((item) => item.id, []);
-
-  const headerComponent = useMemo(() => (
-    <View style={{ height: 190 }} />
-  ), []);
-
-  const footerComponent = useMemo(() => (
-    <View style={{ height: 100 }} />
-  ), []);
-
-  return (
-    <GestureHandlerRootView style={styles.container}>
-      <StatusBar barStyle="light-content" />
-
-      {/* Animated Hero Header */}
-      <AnimatedHeroHeaderV2 animationProgress={animationProgress} />
-
-      {/* Photo Grid */}
-      <Animated.FlatList
-        ref={flatListRef}
-        data={IMAGES_DATA}
-        renderItem={renderImage}
-        keyExtractor={keyExtractor}
-        numColumns={3}
-        onScroll={scrollHandler}
-        onScrollEndDrag={handleScrollEndDrag}
-        scrollEventThrottle={16}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={headerComponent}
-        ListFooterComponent={footerComponent}
-        removeClippedSubviews={false}
-        maxToRenderPerBatch={15}
-        windowSize={10}
-        initialNumToRender={15}
-        contentContainerStyle={styles.gridContent}
-        columnWrapperStyle={styles.row}
-        inverted={false}
-        bounces={true}
-        bouncesZoom={false}
-        contentInsetAdjustmentBehavior="never"
-      />
-
-    </GestureHandlerRootView>
-  );
-}
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000000', // Black background for photo gallery
-  },
-
   // Hero Header Styles
   heroContainer: {
     position: 'absolute',
@@ -361,8 +212,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10,
-    // No background color - let gradient show through
-    overflow: 'visible', // Allow gradient to extend beyond
+    overflow: 'visible',
   },
   heroBackground: {
     position: 'absolute',
@@ -371,27 +221,12 @@ const styles = StyleSheet.create({
     right: 0,
     height: '100%',
   },
-  heroSemiBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(83, 94, 112, 0.5)', // Semi-transparent version of hero color
-  },
-  gradientOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 300, // Extends beyond the hero to create tint effect
-  },
   heroContent: {
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
     justifyContent: 'flex-start',
-    paddingBottom: 8,
+    paddingBottom: 4, // Cut in half
   },
 
   // Title Row
@@ -457,12 +292,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 16,
-    marginRight: 52, // Reduced space - still prevents overlap but closer
+    marginRight: 52,
   },
   avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     borderWidth: 2,
     borderColor: '#FFFFFF',
   },
@@ -486,17 +321,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-
-  // Grid Styles
-  gridContent: {
-    paddingHorizontal: 1,
-  },
-  row: {
-    gap: 2,
-  },
-  gridImage: {
-    width: IMAGE_SIZE,
-    height: IMAGE_SIZE,
-    backgroundColor: '#F2F2F7',
-  },
 });
+
+export default HeroHeader;
