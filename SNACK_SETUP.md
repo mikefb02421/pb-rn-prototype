@@ -3,7 +3,9 @@
 ## Files Created:
 1. `App.js` - Main entry point that combines everything
 2. `components/HeroHeader.js` - Hero header component (stable)
-3. `components/Gallery.js` - Photo grid component (stable)
+3. `components/Gallery.js` - Photo grid component with scroll detection
+4. `components/BottomNav.js` - Bottom navigation with gradient overlay
+5. `components/ScrollToolbar.js` - Secondary toolbar for scroll state
 
 ## How to Upload to Expo Snack:
 
@@ -29,7 +31,9 @@ Add to package.json dependencies:
   "expo-linear-gradient": "~13.0.2",
   "react-native-reanimated": "~3.10.1",
   "react-native-gesture-handler": "~2.16.1",
-  "@expo/vector-icons": "*"
+  "@expo/vector-icons": "*",
+  "expo-blur": "~13.0.2",
+  "expo-haptics": "*"
 }
 ```
 
@@ -40,9 +44,11 @@ Add to package.json dependencies:
 - **App.js orchestrates** - Import and combine all components here
 
 ## Latest Features:
-- **Bidirectional hero animation** - Hero expands/collapses based on scroll direction, not position
-- **Instant responsiveness** - Animation starts immediately when you change scroll direction
-- **Optimized spacing** - Tighter 8pt and 4pt spacing for cleaner layout
+- **Dual navigation system** - BottomNav and ScrollToolbar swap based on scroll
+- **Static gradient overlay** - Constant bottom gradient that doesn't animate
+- **Position-based hero** - Hero animates based on scroll position (0-300px)
+- **Direction-based toolbars** - Navigation swaps instantly on scroll direction change
+- **Optimized pill design** - 44pt height, proper spacing, blur effects
 
 ## Adding New Components (e.g., BottomNav):
 1. Create `components/BottomNav.js` in Snack

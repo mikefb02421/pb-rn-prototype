@@ -27,15 +27,15 @@ const generateMTBImages = () => {
 
 const IMAGES_DATA = generateMTBImages();
 
-const Gallery = ({ onScroll, headerHeight = 190 }) => {
+const Gallery = ({ onScroll, headerHeight = 168 }) => {
   const flatListRef = useRef(null);
   const previousScrollY = useSharedValue(0);
   const scrollDirection = useSharedValue(0); // -1 = up, 1 = down, 0 = no change
 
-  // Function to update parent with new progress value
-  const updateParentProgress = useCallback((progress) => {
+  // Function to update parent with both position and direction
+  const updateParent = useCallback((position, direction) => {
     if (onScroll) {
-      onScroll(progress);
+      onScroll({ position, direction });
     }
   }, [onScroll]);
 
@@ -46,27 +46,26 @@ const Gallery = ({ onScroll, headerHeight = 190 }) => {
       const prevY = previousScrollY.value;
       const deltaY = currentY - prevY;
 
-      // Detect significant direction changes (ignore tiny movements)
+      // Calculate position-based progress (for hero)
+      const maxScroll = 300;
+      const positionProgress = Math.min(1, Math.max(0, currentY / maxScroll));
+
+      // Detect direction changes (for bottom nav)
+      let directionValue = scrollDirection.value;
       if (Math.abs(deltaY) > 2) {
         const newDirection = deltaY > 0 ? 1 : -1; // 1 = down, -1 = up
-
-        // If direction changed, animate to appropriate state
         if (scrollDirection.value !== newDirection) {
           scrollDirection.value = newDirection;
-
-          if (newDirection === 1) {
-            // Scrolling down - immediately trigger parent animation
-            runOnJS(updateParentProgress)(1);
-          } else {
-            // Scrolling up - immediately trigger parent animation
-            runOnJS(updateParentProgress)(0);
-          }
+          directionValue = newDirection;
         }
       }
 
+      // Send both values to parent
+      runOnJS(updateParent)(positionProgress, directionValue);
+
       previousScrollY.value = currentY;
     }
-  }, [updateParentProgress]);
+  }, [updateParent, previousScrollY, scrollDirection]);
 
   const renderImage = useCallback(({ item }) => {
     return (

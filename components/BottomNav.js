@@ -1,0 +1,201 @@
+// BottomNav.js - Bottom Navigation Component
+import React, { useState } from 'react';
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  Dimensions,
+} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  interpolate,
+  Easing,
+} from 'react-native-reanimated';
+import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
+
+const { width: screenWidth } = Dimensions.get('window');
+
+const BottomNav = ({ scrollDirection }) => {
+  const [activeTab, setActiveTab] = useState('home');
+
+  // Animate bottom nav based on scroll direction
+  const bottomNavStyle = useAnimatedStyle(() => {
+    // Show by default (0 or -1), hide when scrolling down (1)
+    const shouldHide = scrollDirection && scrollDirection.value === 1;
+    const translateY = withTiming(
+      shouldHide ? 120 : 0,
+      {
+        duration: 500, // Increased from 300ms to 500ms
+        easing: Easing.out(Easing.cubic),
+      }
+    );
+
+    return {
+      transform: [{ translateY }],
+    };
+  });
+
+  // Handle tab press with haptic feedback
+  const handleTabPress = (tabName) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setActiveTab(tabName);
+  };
+
+  const handleAddPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // Handle add action
+  };
+
+  const NavItem = ({ name, iconName, IconComponent = Ionicons, size = 26 }) => {
+    const isActive = activeTab === name;
+
+    return (
+      <TouchableOpacity
+        style={styles.navItem}
+        onPress={() => handleTabPress(name)}
+        activeOpacity={0.7}
+      >
+        <IconComponent
+          name={iconName}
+          size={size}
+          color={isActive ? '#007AFF' : '#8E8E93'}
+        />
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <>
+      {/* Full-width gradient overlay - always visible, not animated */}
+      <LinearGradient
+        colors={[
+          'transparent',           // Fully transparent at top
+          'rgba(0, 0, 0, 0.01)',  // Barely there
+          'rgba(0, 0, 0, 0.02)',  // Almost nothing
+          'rgba(0, 0, 0, 0.04)',  // Extremely light
+          'rgba(0, 0, 0, 0.08)',  // Very light
+          'rgba(0, 0, 0, 0.15)',  // Light
+          'rgba(0, 0, 0, 0.3)',   // Medium
+          'rgba(0, 0, 0, 0.5)',   // Medium-dark
+          'rgba(0, 0, 0, 0.7)',   // Dark
+          'rgba(0, 0, 0, 0.9)',   // Much darker at bottom
+        ]}
+        locations={[0, 0.03, 0.08, 0.15, 0.25, 0.35, 0.5, 0.65, 0.8, 1]}
+        style={styles.gradientOverlay}
+        pointerEvents="none"
+      />
+
+      {/* Navigation pill - animated separately */}
+      <Animated.View style={[styles.pillWrapper, bottomNavStyle]}>
+        <BlurView intensity={80} tint="light" style={styles.blurContainer}>
+          <View style={styles.pillContainer}>
+            {/* Navigation Items */}
+            <View style={styles.navItems}>
+              {/* Home */}
+              <NavItem name="home" iconName="home" size={28} />
+
+              {/* Media */}
+              <NavItem name="media" iconName="image-outline" size={26} />
+
+              {/* Albums */}
+              <NavItem
+                name="albums"
+                iconName="book-open-variant"
+                IconComponent={MaterialCommunityIcons}
+                size={26}
+              />
+
+              {/* Settings */}
+              <NavItem name="settings" iconName="settings-outline" size={26} />
+
+              {/* Add Button - Special styling */}
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={handleAddPress}
+                activeOpacity={0.8}
+              >
+                <View style={styles.addButtonInner}>
+                  <Ionicons name="add" size={32} color="#FFFFFF" />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </BlurView>
+      </Animated.View>
+    </>
+  );
+};
+
+const styles = StyleSheet.create({
+  gradientOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 200, // Extended gradient area
+    zIndex: 100, // Below navigation pills
+  },
+  pillWrapper: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 34 : 20, // Account for safe area
+    left: 20,
+    right: 20,
+    zIndex: 101, // Above gradient
+  },
+  blurContainer: {
+    borderRadius: 35,
+    overflow: 'hidden',
+  },
+  pillContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    borderRadius: 35,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  navItems: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 48,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 48,
+    marginHorizontal: 2,
+  },
+  addButton: {
+    width: 56,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  addButtonInner: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#5AC8C8', // Teal color from design
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#5AC8C8',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+});
+
+export default BottomNav;

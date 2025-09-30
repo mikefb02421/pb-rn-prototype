@@ -9,8 +9,6 @@ import Animated, {
   useAnimatedStyle,
   interpolate,
   Extrapolate,
-  withTiming,
-  Easing,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -18,12 +16,15 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 // Import components
 import HeroHeader from './components/HeroHeader';
 import Gallery from './components/Gallery';
+import BottomNav from './components/BottomNav';
+import ScrollToolbar from './components/ScrollToolbar';
 
 // Create animated version of LinearGradient
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 export default function App() {
   const animationProgress = useSharedValue(0);
+  const scrollDirection = useSharedValue(0); // For future bottom nav
 
   // Gradient animation style - fades in when scrolled
   const gradientStyle = useAnimatedStyle(() => {
@@ -37,13 +38,13 @@ export default function App() {
     return { opacity };
   });
 
-  // Handle scroll direction from Gallery component
-  const handleScroll = (progress) => {
-    // Gallery sends discrete 0 or 1 values, animate smoothly
-    animationProgress.value = withTiming(progress, {
-      duration: 400,
-      easing: Easing.out(Easing.cubic)
-    });
+  // Handle scroll data from Gallery component
+  const handleScroll = ({ position, direction }) => {
+    // Hero uses position-based animation (smooth gradient based on scroll position)
+    animationProgress.value = position;
+
+    // Store direction for future bottom nav component
+    scrollDirection.value = direction;
   };
 
   return (
@@ -74,6 +75,12 @@ export default function App() {
 
       {/* Hero Header - On top of everything */}
       <HeroHeader animationProgress={animationProgress} />
+
+      {/* Secondary Toolbar - Shows when scrolling down */}
+      <ScrollToolbar scrollDirection={scrollDirection} />
+
+      {/* Bottom Navigation - Hides when scrolling down */}
+      <BottomNav scrollDirection={scrollDirection} />
     </GestureHandlerRootView>
   );
 }

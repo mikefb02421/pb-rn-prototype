@@ -2,9 +2,16 @@
 
 ## Latest Updates
 
-### Bidirectional Hero Animation (Latest)
-- **Hero responds to scroll direction, not position** - Animation triggers immediately when user changes from scrolling down to up (or vice versa)
-- **No need to scroll to top** - Hero expands as soon as you start scrolling up, regardless of position
+### Dual Navigation System (Latest)
+- **BottomNav component** - Main navigation with Home, Media, Albums, Settings, Add button
+- **ScrollToolbar component** - Secondary toolbar with Filter, Sort, More, Select buttons
+- **Static gradient overlay** - Full-width gradient at bottom that remains constant
+- **Scroll-based navigation swap** - BottomNav hides and ScrollToolbar appears when scrolling down
+- **Unified animation timing** - Both toolbars use 500ms animations for smooth transitions
+
+### Hero Animation Updates
+- **Position-based animation restored** - Hero animates based on scroll position (0-300px range)
+- **Gallery tracks both** - Sends both position (for hero) and direction (for navigation) to parent
 - **Smooth 400ms transitions** - Using cubic easing for natural feel
 - **Optimized spacing** - Reduced internal spacing (8pt spacer, 4pt padding) and hero height (168px)
 - **Avatar improvements** - Faster fade (50% of animation) with up+right movement
