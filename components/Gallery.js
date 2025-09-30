@@ -41,6 +41,8 @@ const Gallery = ({ onScroll, headerHeight = 168 }) => {
 
   const handleScroll = useCallback((event) => {
     const currentY = event.nativeEvent.contentOffset.y;
+    const contentSize = event.nativeEvent.contentSize.height;
+    const layoutHeight = event.nativeEvent.layoutMeasurement.height;
 
     if (currentY >= 0 && currentY < 5000) {
       const prevY = previousScrollY.value;
@@ -50,9 +52,12 @@ const Gallery = ({ onScroll, headerHeight = 168 }) => {
       const maxScroll = 300;
       const positionProgress = Math.min(1, Math.max(0, currentY / maxScroll));
 
+      // Check if we're near the bottom to prevent bounce direction changes
+      const isNearBottom = currentY + layoutHeight >= contentSize - 50; // 50px buffer
+
       // Detect direction changes (for bottom nav)
       let directionValue = scrollDirection.value;
-      if (Math.abs(deltaY) > 2) {
+      if (Math.abs(deltaY) > 2 && !isNearBottom) {
         const newDirection = deltaY > 0 ? 1 : -1; // 1 = down, -1 = up
         if (scrollDirection.value !== newDirection) {
           scrollDirection.value = newDirection;

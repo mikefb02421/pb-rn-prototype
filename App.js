@@ -57,16 +57,16 @@ export default function App() {
       {/* Gradient Overlay - Appears when scrolled */}
       <AnimatedLinearGradient
         colors={[
-          'rgba(0, 0, 0, 0.9)',   // Much darker at top for hamburger menu clarity
-          'rgba(0, 0, 0, 0.7)',   // Dark
-          'rgba(0, 0, 0, 0.5)',   // Medium-dark
+          'rgba(0, 0, 0, 0.7)',  // Much darker at top for hamburger menu clarity
+          'rgba(0, 0, 0, 0.6)',   // Dark
+          'rgba(0, 0, 0, 0.4)',   // Medium-dark
           'rgba(0, 0, 0, 0.3)',   // Medium
           'rgba(0, 0, 0, 0.15)',  // Light
           'rgba(0, 0, 0, 0.08)',  // Very light
           'rgba(0, 0, 0, 0.04)',  // Extremely light
           'rgba(0, 0, 0, 0.02)',  // Almost nothing
           'rgba(0, 0, 0, 0.01)',  // Barely there
-          'transparent'           // Fully transparent
+          'transparent'           // Fully transparent at bottom
         ]}
         locations={[0, 0.2, 0.35, 0.5, 0.65, 0.75, 0.85, 0.92, 0.97, 1]}
         style={[styles.separateGradient, gradientStyle]}
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 350, // Extended height for smooth fade over photos
+    height: 180, // Reduced height
     zIndex: 5, // Above photos but below hero content
   },
 });

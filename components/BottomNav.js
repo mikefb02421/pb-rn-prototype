@@ -22,7 +22,7 @@ import * as Haptics from 'expo-haptics';
 const { width: screenWidth } = Dimensions.get('window');
 
 const BottomNav = ({ scrollDirection }) => {
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState('media');
 
   // Animate bottom nav based on scroll direction
   const bottomNavStyle = useAnimatedStyle(() => {
@@ -64,7 +64,7 @@ const BottomNav = ({ scrollDirection }) => {
         <IconComponent
           name={iconName}
           size={size}
-          color={isActive ? '#007AFF' : '#8E8E93'}
+          color={isActive ? '#1C47CB' : '#8E8E93'}
         />
       </TouchableOpacity>
     );
@@ -84,7 +84,7 @@ const BottomNav = ({ scrollDirection }) => {
           'rgba(0, 0, 0, 0.3)',   // Medium
           'rgba(0, 0, 0, 0.5)',   // Medium-dark
           'rgba(0, 0, 0, 0.7)',   // Dark
-          'rgba(0, 0, 0, 0.9)',   // Much darker at bottom
+          'rgba(0, 0, 0, 0.75)',  // Much darker at bottom
         ]}
         locations={[0, 0.03, 0.08, 0.15, 0.25, 0.35, 0.5, 0.65, 0.8, 1]}
         style={styles.gradientOverlay}
@@ -101,13 +101,12 @@ const BottomNav = ({ scrollDirection }) => {
               <NavItem name="home" iconName="home" size={28} />
 
               {/* Media */}
-              <NavItem name="media" iconName="image-outline" size={26} />
+              <NavItem name="media" iconName="images-outline" size={26} />
 
               {/* Albums */}
               <NavItem
                 name="albums"
-                iconName="book-open-variant"
-                IconComponent={MaterialCommunityIcons}
+                iconName="albums-outline"
                 size={26}
               />
 
@@ -120,9 +119,14 @@ const BottomNav = ({ scrollDirection }) => {
                 onPress={handleAddPress}
                 activeOpacity={0.8}
               >
-                <View style={styles.addButtonInner}>
+                <LinearGradient
+                  colors={['#1C47CB', '#02E39F']}
+                  style={styles.addButtonInner}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
                   <Ionicons name="add" size={32} color="#FFFFFF" />
-                </View>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>
@@ -187,10 +191,9 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#5AC8C8', // Teal color from design
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#5AC8C8',
+    shadowColor: '#1C47CB',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 6,

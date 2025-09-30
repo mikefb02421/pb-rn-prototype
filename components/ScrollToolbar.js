@@ -51,7 +51,7 @@ const ScrollToolbar = ({ scrollDirection }) => {
               onPress={() => handleButtonPress('filter')}
               activeOpacity={0.7}
             >
-              <Ionicons name="filter" size={22} color="#007AFF" />
+              <Ionicons name="filter" size={22} color="#1C47CB" />
             </TouchableOpacity>
 
             {/* Sort button */}
@@ -60,7 +60,7 @@ const ScrollToolbar = ({ scrollDirection }) => {
               onPress={() => handleButtonPress('sort')}
               activeOpacity={0.7}
             >
-              <MaterialCommunityIcons name="sort" size={22} color="#007AFF" />
+              <MaterialCommunityIcons name="sort" size={22} color="#1C47CB" />
             </TouchableOpacity>
 
             {/* More options */}
@@ -69,7 +69,7 @@ const ScrollToolbar = ({ scrollDirection }) => {
               onPress={() => handleButtonPress('more')}
               activeOpacity={0.7}
             >
-              <Ionicons name="ellipsis-horizontal" size={22} color="#007AFF" />
+              <Ionicons name="ellipsis-horizontal" size={22} color="#1C47CB" />
             </TouchableOpacity>
           </View>
 
@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.92)',
-    borderRadius: 22,
-    height: 44, // 44pt tall
+    borderRadius: 26,
+    height: 52, // Increased to accommodate larger touch targets
     paddingHorizontal: 6,
     marginRight: 44, // 44pt gap to select button
     shadowColor: '#000',
@@ -115,18 +115,18 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   iconButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 1,
+    marginHorizontal: 4,
   },
   selectButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.92)',
     paddingHorizontal: 20,
-    height: 44, // 44pt tall
-    borderRadius: 22,
+    height: 52, // Matched to left pill height
+    borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   selectText: {
-    color: '#007AFF',
+    color: '#1C47CB',
     fontSize: 15,
     fontWeight: '600',
   },

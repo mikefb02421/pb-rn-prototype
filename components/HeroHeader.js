@@ -78,7 +78,7 @@ const HeroHeader = ({ animationProgress }) => {
     const translateY = interpolate(
       animationProgress.value,
       [0, 1],
-      [0, -60], // Move up to match other elements
+      [0, -52], // Move up less to align with other elements
       Extrapolate.CLAMP
     );
 
@@ -100,7 +100,7 @@ const HeroHeader = ({ animationProgress }) => {
     const translateY = interpolate(
       animationProgress.value,
       [0, 1],
-      [0, -60], // Move up to hamburger menu level
+      [0, -52], // Move up less to align with hamburger center (60 - 8 = 52)
       Extrapolate.CLAMP
     );
 
@@ -122,7 +122,7 @@ const HeroHeader = ({ animationProgress }) => {
     const translateY = interpolate(
       animationProgress.value,
       [0, 1],
-      [0, -60], // Move up to hamburger menu level
+      [0, -52], // Move up less to align with hamburger center (60 - 8 = 52)
       Extrapolate.CLAMP
     );
 
@@ -135,10 +135,13 @@ const HeroHeader = ({ animationProgress }) => {
     <Animated.View style={[styles.heroContainer, heroStyle]}>
       {/* Background Image */}
       <Animated.Image
-        source={{ uri: 'https://picsum.photos/800/400?random=hero' }}
+        source={{ uri: 'https://picsum.photos/800/400?random=1' }}
         style={[styles.heroBackground, backgroundStyle]}
         resizeMode="cover"
       />
+
+      {/* Dark Overlay - Animated to fade with image */}
+      <Animated.View style={[styles.darkOverlay, backgroundStyle]} />
 
       {/* Content Container */}
       <View style={styles.heroContent}>
@@ -166,7 +169,7 @@ const HeroHeader = ({ animationProgress }) => {
               <TextInput
                 style={styles.searchInput}
                 placeholder="Search MTB Crew!"
-                placeholderTextColor="#8E8E93"
+                placeholderTextColor="#1C47CB"
                 editable={false}
               />
             </View>
@@ -220,6 +223,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: '100%',
+  },
+  darkOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // 30% black overlay
   },
   heroContent: {
     flex: 1,
@@ -312,7 +323,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#1C47CB',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
