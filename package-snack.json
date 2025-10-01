@@ -21,7 +21,9 @@
     "react-native-gesture-handler": "~2.28.0",
     "expo-blur": "~15.0.1",
     "react-native-screens": "~4.4.0",
-    "react-native-safe-area-context": "4.17.0"
+    "react-native-safe-area-context": "4.17.0",
+    "react-native-svg": "15.9.0",
+    "@react-native-masked-view/masked-view": "0.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

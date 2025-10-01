@@ -16,13 +16,15 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 // Import components
 import HeroHeader from './components/HeroHeader';
 import Gallery from './components/Gallery';
-import BottomNav from './components/BottomNav';
+import BottomNav from './components/BottomNavAlt';
 import ScrollToolbar from './components/ScrollToolbar';
+import HomePage from './components/HomePageMask';
 
 // Create animated version of LinearGradient
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 export default function App() {
+  const [isHomePageOpen, setIsHomePageOpen] = React.useState(false);
   const animationProgress = useSharedValue(0);
   const scrollDirection = useSharedValue(0); // For future bottom nav
 
@@ -77,10 +79,21 @@ export default function App() {
       <HeroHeader animationProgress={animationProgress} />
 
       {/* Secondary Toolbar - Shows when scrolling down */}
-      <ScrollToolbar scrollDirection={scrollDirection} />
+      {!isHomePageOpen && <ScrollToolbar scrollDirection={scrollDirection} />}
 
       {/* Bottom Navigation - Hides when scrolling down */}
-      <BottomNav scrollDirection={scrollDirection} />
+      {!isHomePageOpen && (
+        <BottomNav
+          scrollDirection={scrollDirection}
+          onHomePress={() => setIsHomePageOpen(true)}
+        />
+      )}
+
+      {/* Home Page - Expands from bottom-left */}
+      <HomePage
+        isVisible={isHomePageOpen}
+        onClose={() => setIsHomePageOpen(false)}
+      />
     </GestureHandlerRootView>
   );
 }

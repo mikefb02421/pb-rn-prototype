@@ -16,7 +16,7 @@ const IMAGE_SIZE = (screenWidth - 4) / 3;
 // Generate mountain biking themed images
 const generateMTBImages = () => {
   const images = [];
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 100; i++) {
     images.push({
       id: i.toString(),
       uri: `https://picsum.photos/400/400?random=${i}`,

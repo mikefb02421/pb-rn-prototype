@@ -2,7 +2,17 @@
 
 ## Latest Updates
 
-### Dual Navigation System (Latest)
+### Brand Color Theming & UX Improvements (Latest)
+- **Brand color application** - Updated all UI elements to use brand blue (#1C47CB)
+- **Gradient add button** - Applied diagonal gradient from #1C47CB to #02E39F
+- **Enhanced touch targets** - ScrollToolbar buttons now 44pt minimum (Apple HIG compliant)
+- **Navigation context** - Set media tab as active (appropriate for gallery page)
+- **Icon updates** - Changed to images-outline and albums-outline for better semantics
+- **Gradient optimization** - Reduced overlay intensity (0.9→0.75) and height (500px→180px)
+- **Bounce protection** - Added scroll boundary detection to prevent nav switching during overscroll
+- **Mirror gradients** - Hero and bottom nav gradients now perfectly mirror each other
+
+### Dual Navigation System
 - **BottomNav component** - Main navigation with Home, Media, Albums, Settings, Add button
 - **ScrollToolbar component** - Secondary toolbar with Filter, Sort, More, Select buttons
 - **Static gradient overlay** - Full-width gradient at bottom that remains constant

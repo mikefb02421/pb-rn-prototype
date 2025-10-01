@@ -24,7 +24,7 @@ const ScrollToolbar = ({ scrollDirection }) => {
     const translateY = withTiming(
       shouldShow ? 0 : 100, // Slide up from bottom when showing
       {
-        duration: 500,
+        duration: 650,
         easing: Easing.out(Easing.cubic),
       }
     );

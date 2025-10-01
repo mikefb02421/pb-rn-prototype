@@ -1,4 +1,4 @@
-// BottomNav.js - Bottom Navigation Component
+// BottomNavAlt.js - Alternative Bottom Navigation Component
 import React, { useState } from 'react';
 import {
   View,
@@ -21,7 +21,7 @@ import * as Haptics from 'expo-haptics';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const BottomNav = ({ scrollDirection }) => {
+const BottomNavAlt = ({ scrollDirection, onHomePress }) => {
   const [activeTab, setActiveTab] = useState('media');
 
   // Animate bottom nav based on scroll direction
@@ -44,7 +44,11 @@ const BottomNav = ({ scrollDirection }) => {
   // Handle tab press with haptic feedback
   const handleTabPress = (tabName) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setActiveTab(tabName);
+    if (tabName === 'home' && onHomePress) {
+      onHomePress();
+    } else {
+      setActiveTab(tabName);
+    }
   };
 
   const handleAddPress = () => {
@@ -91,15 +95,29 @@ const BottomNav = ({ scrollDirection }) => {
         pointerEvents="none"
       />
 
-      {/* Navigation pill - animated separately */}
-      <Animated.View style={[styles.pillWrapper, bottomNavStyle]}>
+      {/* Two-part navigation - animated together */}
+      <Animated.View style={[styles.navContainer, bottomNavStyle]}>
+        {/* Home button - separate circular toolbar */}
+        <BlurView intensity={80} tint="light" style={styles.homeBlurContainer}>
+          <View style={styles.homeContainer}>
+            <TouchableOpacity
+              style={styles.homeButton}
+              onPress={() => handleTabPress('home')}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="home"
+                size={28}
+                color={activeTab === 'home' ? '#1C47CB' : '#8E8E93'}
+              />
+            </TouchableOpacity>
+          </View>
+        </BlurView>
+
+        {/* Main navigation pill */}
         <BlurView intensity={80} tint="light" style={styles.blurContainer}>
           <View style={styles.pillContainer}>
-            {/* Navigation Items */}
             <View style={styles.navItems}>
-              {/* Home */}
-              <NavItem name="home" iconName="home" size={28} />
-
               {/* Media */}
               <NavItem name="media" iconName="images-outline" size={26} />
 
@@ -145,14 +163,45 @@ const styles = StyleSheet.create({
     height: 200, // Extended gradient area
     zIndex: 100, // Below navigation pills
   },
-  pillWrapper: {
+  navContainer: {
     position: 'absolute',
     bottom: Platform.OS === 'ios' ? 34 : 20, // Account for safe area
     left: 20,
     right: 20,
     zIndex: 101, // Above gradient
+    flexDirection: 'row',
+    alignItems: 'center',
   },
+  // Home button styles
+  homeBlurContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    overflow: 'hidden',
+    marginRight: 12, // Gap between home and main pill
+  },
+  homeContainer: {
+    width: 72,
+    height: 72,
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    borderRadius: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  homeButton: {
+    width: 72,
+    height: 72,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Main pill styles
   blurContainer: {
+    flex: 1,
     borderRadius: 35,
     overflow: 'hidden',
   },
@@ -201,4 +250,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BottomNav;
+export default BottomNavAlt;
