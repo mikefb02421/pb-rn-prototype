@@ -17,14 +17,10 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import MaskedView from '@react-native-masked-view/masked-view';
-import Svg, { Circle } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-
-// Create animated components
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 // Dummy activity feed data
 const ACTIVITY_FEED = [
@@ -130,7 +126,7 @@ const ACTIVITY_FEED = [
   },
 ];
 
-const HomePageMask = ({ isVisible, onClose }) => {
+const HomePageMask = ({ isVisible, onClose, animationConfig }) => {
   const circleRadius = useSharedValue(0);
   const backdropOpacity = useSharedValue(0);
 
@@ -152,29 +148,36 @@ const HomePageMask = ({ isVisible, onClose }) => {
   const maxRadius = calculateMaxRadius();
 
   useEffect(() => {
+    // Use custom bezier config if provided, otherwise use defaults
+    const closeConfig = animationConfig || {
+      x1: 0.33, y1: 1, x2: 0.68, y2: 1,
+      duration: 750
+    };
+
     if (isVisible) {
       // Animate in - circular reveal
+      // Easing.inOut(Easing.quad) = even slower start/end with gentler curve
       circleRadius.value = withTiming(maxRadius, {
-        duration: 600,
-        easing: Easing.out(Easing.cubic),
+        duration: 850, // Longer duration for more pronounced slow phases
+        easing: Easing.inOut(Easing.quad),
       });
       // Fade in backdrop synchronized with circle growth
       backdropOpacity.value = withTiming(0.5, {
-        duration: 600,
-        easing: Easing.out(Easing.cubic),
+        duration: 850,
+        easing: Easing.inOut(Easing.quad),
       });
     } else {
-      // Animate out - reverse circular reveal
+      // Animate out - reverse circular reveal with custom bezier curve
       circleRadius.value = withTiming(0, {
-        duration: 450,
-        easing: Easing.in(Easing.cubic),
+        duration: closeConfig.duration,
+        easing: Easing.bezier(closeConfig.x1, closeConfig.y1, closeConfig.x2, closeConfig.y2),
       });
       backdropOpacity.value = withTiming(0, {
-        duration: 450,
-        easing: Easing.in(Easing.cubic),
+        duration: closeConfig.duration,
+        easing: Easing.bezier(closeConfig.x1, closeConfig.y1, closeConfig.x2, closeConfig.y2),
       });
     }
-  }, [isVisible, maxRadius]);
+  }, [isVisible, maxRadius, animationConfig, circleRadius, backdropOpacity]);
 
   // Backdrop animation
   const backdropStyle = useAnimatedStyle(() => ({
@@ -182,11 +185,13 @@ const HomePageMask = ({ isVisible, onClose }) => {
     pointerEvents: isVisible ? 'auto' : 'none',
   }));
 
-  // Animated props for the mask circle
-  const animatedCircleProps = useAnimatedProps(() => ({
-    r: circleRadius.value,
-    cx: buttonCenterX,
-    cy: buttonCenterY,
+  // Animated styles for the mask circle
+  const maskCircleStyle = useAnimatedStyle(() => ({
+    width: circleRadius.value * 2,
+    height: circleRadius.value * 2,
+    borderRadius: circleRadius.value,
+    left: buttonCenterX - circleRadius.value,
+    top: buttonCenterY - circleRadius.value,
   }));
 
   // Container visibility
@@ -195,10 +200,6 @@ const HomePageMask = ({ isVisible, onClose }) => {
     pointerEvents: isVisible ? 'auto' : 'none',
   }));
 
-  const handleClose = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onClose();
-  };
 
   const ActivityItem = ({ item }) => (
     <View style={styles.activityItem}>
@@ -230,12 +231,9 @@ const HomePageMask = ({ isVisible, onClose }) => {
         <MaskedView
           style={StyleSheet.absoluteFillObject}
           maskElement={
-            <Svg width={screenWidth} height={screenHeight}>
-              <AnimatedCircle
-                animatedProps={animatedCircleProps}
-                fill="white"
-              />
-            </Svg>
+            <View style={StyleSheet.absoluteFillObject}>
+              <Animated.View style={[styles.maskCircle, maskCircleStyle]} />
+            </View>
           }
         >
           {/* Page Content - Static, full size */}
@@ -246,13 +244,6 @@ const HomePageMask = ({ isVisible, onClose }) => {
                 <Text style={styles.welcomeText}>Welcome back,</Text>
                 <Text style={styles.userName}>Mike</Text>
               </View>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={handleClose}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="close" size={32} color="#000000" />
-              </TouchableOpacity>
             </View>
 
             {/* Activity Feed */}
@@ -291,13 +282,17 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 999,
   },
+  maskCircle: {
+    position: 'absolute',
+    backgroundColor: 'white',
+  },
   pageContent: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'flex-start',
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
@@ -315,14 +310,6 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     color: '#000000',
-  },
-  closeButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#F2F2F7',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   feedContainer: {
     flex: 1,

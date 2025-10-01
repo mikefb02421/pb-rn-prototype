@@ -19,12 +19,15 @@ import Gallery from './components/Gallery';
 import BottomNav from './components/BottomNavAlt';
 import ScrollToolbar from './components/ScrollToolbar';
 import HomePage from './components/HomePageMask';
+// import AnimationControls from './components/AnimationControls';
 
 // Create animated version of LinearGradient
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 export default function App() {
   const [isHomePageOpen, setIsHomePageOpen] = React.useState(false);
+  // const [showControls, setShowControls] = React.useState(false);
+  // const [animationConfig, setAnimationConfig] = React.useState(null);
   const animationProgress = useSharedValue(0);
   const scrollDirection = useSharedValue(0); // For future bottom nav
 
@@ -81,13 +84,12 @@ export default function App() {
       {/* Secondary Toolbar - Shows when scrolling down */}
       {!isHomePageOpen && <ScrollToolbar scrollDirection={scrollDirection} />}
 
-      {/* Bottom Navigation - Hides when scrolling down */}
-      {!isHomePageOpen && (
-        <BottomNav
-          scrollDirection={scrollDirection}
-          onHomePress={() => setIsHomePageOpen(true)}
-        />
-      )}
+      {/* Bottom Navigation - Always visible, handles open/close */}
+      <BottomNav
+        scrollDirection={scrollDirection}
+        isHomePageOpen={isHomePageOpen}
+        onHomePress={() => setIsHomePageOpen(!isHomePageOpen)}
+      />
 
       {/* Home Page - Expands from bottom-left */}
       <HomePage

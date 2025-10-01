@@ -2,7 +2,18 @@
 
 ## Latest Updates
 
-### Brand Color Theming & UX Improvements (Latest)
+### HomePage with Circular Reveal Animation (Latest)
+- **Circular mask reveal** - True unmasking effect using react-native-masked-view
+- **Two-part navigation** - Separated home button into its own circular toolbar
+- **Activity feed** - HomePage shows activity from all user Buckets
+- **Origin animation** - Circle expands from exact home button position (bottom-left)
+- **Hard edge reveal** - Clean circular boundary with no blur/feather
+- **Synchronized backdrop** - Backdrop fades in as circle grows
+- **Static content** - Page content doesn't scale, only mask animates
+- **Navigation hiding** - Bottom nav and toolbar hide when HomePage is open
+- **Performance improvements** - Doubled photos to 100, slowed nav transitions to 650ms
+
+### Brand Color Theming & UX Improvements
 - **Brand color application** - Updated all UI elements to use brand blue (#1C47CB)
 - **Gradient add button** - Applied diagonal gradient from #1C47CB to #02E39F
 - **Enhanced touch targets** - ScrollToolbar buttons now 44pt minimum (Apple HIG compliant)

@@ -1,5 +1,5 @@
 // BottomNavAlt.js - Alternative Bottom Navigation Component
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
+  useSharedValue,
   withTiming,
   withSpring,
   interpolate,
@@ -21,13 +22,31 @@ import * as Haptics from 'expo-haptics';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const BottomNavAlt = ({ scrollDirection, onHomePress }) => {
+const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen }) => {
   const [activeTab, setActiveTab] = useState('media');
+  const shadowOpacity = useSharedValue(0);
+
+  // Animate shadow when HomePage opens/closes
+  useEffect(() => {
+    if (isHomePageOpen) {
+      // Add shadow for elevation
+      shadowOpacity.value = withTiming(1, {
+        duration: 300,
+        easing: Easing.out(Easing.cubic),
+      });
+    } else {
+      // Remove shadow
+      shadowOpacity.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.out(Easing.cubic),
+      });
+    }
+  }, [isHomePageOpen, shadowOpacity]);
 
   // Animate bottom nav based on scroll direction
   const bottomNavStyle = useAnimatedStyle(() => {
-    // Show by default (0 or -1), hide when scrolling down (1)
-    const shouldHide = scrollDirection && scrollDirection.value === 1;
+    // Don't hide when HomePage is open
+    const shouldHide = !isHomePageOpen && scrollDirection && scrollDirection.value === 1;
     const translateY = withTiming(
       shouldHide ? 120 : 0,
       {
@@ -38,6 +57,20 @@ const BottomNavAlt = ({ scrollDirection, onHomePress }) => {
 
     return {
       transform: [{ translateY }],
+    };
+  });
+
+  // Animated styles for home button container
+  const homeContainerAnimatedStyle = useAnimatedStyle(() => {
+    // Much stronger shadow when HomePage is open for visibility
+    return {
+      shadowOpacity: interpolate(shadowOpacity.value, [0, 1], [0.15, 0.6]),
+      shadowRadius: interpolate(shadowOpacity.value, [0, 1], [12, 35]),
+      shadowOffset: {
+        width: 0,
+        height: interpolate(shadowOpacity.value, [0, 1], [4, 15]),
+      },
+      elevation: interpolate(shadowOpacity.value, [0, 1], [8, 25]),
     };
   });
 
@@ -95,27 +128,9 @@ const BottomNavAlt = ({ scrollDirection, onHomePress }) => {
         pointerEvents="none"
       />
 
-      {/* Two-part navigation - animated together */}
-      <Animated.View style={[styles.navContainer, bottomNavStyle]}>
-        {/* Home button - separate circular toolbar */}
-        <BlurView intensity={80} tint="light" style={styles.homeBlurContainer}>
-          <View style={styles.homeContainer}>
-            <TouchableOpacity
-              style={styles.homeButton}
-              onPress={() => handleTabPress('home')}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name="home"
-                size={28}
-                color={activeTab === 'home' ? '#1C47CB' : '#8E8E93'}
-              />
-            </TouchableOpacity>
-          </View>
-        </BlurView>
-
-        {/* Main navigation pill */}
-        <BlurView intensity={80} tint="light" style={styles.blurContainer}>
+      {/* Main navigation pill - lower z-index, gets covered by HomePage */}
+      <Animated.View style={[styles.mainNavContainer, bottomNavStyle]}>
+        <BlurView intensity={80} tint="light" style={styles.mainBlurContainer}>
           <View style={styles.pillContainer}>
             <View style={styles.navItems}>
               {/* Media */}
@@ -150,6 +165,29 @@ const BottomNavAlt = ({ scrollDirection, onHomePress }) => {
           </View>
         </BlurView>
       </Animated.View>
+
+      {/* Home button - higher z-index, always visible above HomePage */}
+      <Animated.View style={[styles.homeButtonContainer, bottomNavStyle]}>
+        <BlurView intensity={80} tint="light" style={styles.homeBlurContainer}>
+          <Animated.View style={[
+            styles.homeContainer,
+            isHomePageOpen && styles.homeContainerOpen,
+            homeContainerAnimatedStyle
+          ]}>
+            <TouchableOpacity
+              style={styles.homeButton}
+              onPress={() => handleTabPress('home')}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name={isHomePageOpen ? "close" : "home"}
+                size={28}
+                color={isHomePageOpen ? '#000000' : (activeTab === 'home' ? '#1C47CB' : '#8E8E93')}
+              />
+            </TouchableOpacity>
+          </Animated.View>
+        </BlurView>
+      </Animated.View>
     </>
   );
 };
@@ -163,14 +201,18 @@ const styles = StyleSheet.create({
     height: 200, // Extended gradient area
     zIndex: 100, // Below navigation pills
   },
-  navContainer: {
+  mainNavContainer: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 34 : 20, // Account for safe area
-    left: 20,
+    bottom: Platform.OS === 'ios' ? 34 : 20,
+    left: 104, // Space for home button (72px) + gap (12px) + padding (20px)
     right: 20,
-    zIndex: 101, // Above gradient
-    flexDirection: 'row',
-    alignItems: 'center',
+    zIndex: 101, // Below HomePage (999)
+  },
+  homeButtonContainer: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 34 : 20,
+    left: 20,
+    zIndex: 1000, // Above HomePage (999)
   },
   // Home button styles
   homeBlurContainer: {
@@ -183,10 +225,11 @@ const styles = StyleSheet.create({
   homeContainer: {
     width: 72,
     height: 72,
-    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
+    // Base shadow
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
@@ -199,9 +242,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  homeContainerOpen: {
+    // Additional styles when HomePage is open
+    backgroundColor: 'rgba(255, 255, 255, 1)',
+    borderWidth: 0.75,
+    borderColor: 'rgba(0, 0, 0, 0.12)',
+  },
   // Main pill styles
-  blurContainer: {
-    flex: 1,
+  mainBlurContainer: {
     borderRadius: 35,
     overflow: 'hidden',
   },
