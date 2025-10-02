@@ -19,6 +19,7 @@ import Gallery from './components/Gallery';
 import BottomNav from './components/BottomNavAlt';
 import ScrollToolbar from './components/ScrollToolbar';
 import HomePage from './components/HomePageMask';
+import BucketSettings from './components/BucketSettings';
 // import AnimationControls from './components/AnimationControls';
 
 // Create animated version of LinearGradient
@@ -26,6 +27,8 @@ const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 export default function App() {
   const [isHomePageOpen, setIsHomePageOpen] = React.useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+  const [isRightHanded, setIsRightHanded] = React.useState(false); // Default is left-handed
   // const [showControls, setShowControls] = React.useState(false);
   // const [animationConfig, setAnimationConfig] = React.useState(null);
   const animationProgress = useSharedValue(0);
@@ -56,11 +59,12 @@ export default function App() {
     <GestureHandlerRootView style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      {/* Photo Gallery */}
-      <Gallery onScroll={handleScroll} headerHeight={168} />
+      {/* Photo Gallery - Hidden when settings or home page is open */}
+      {!isSettingsOpen && <Gallery onScroll={handleScroll} headerHeight={168} />}
 
-      {/* Gradient Overlay - Appears when scrolled */}
-      <AnimatedLinearGradient
+      {/* Gradient Overlay - Appears when scrolled, hidden when settings is open */}
+      {!isSettingsOpen && (
+        <AnimatedLinearGradient
         colors={[
           'rgba(0, 0, 0, 0.7)',  // Much darker at top for hamburger menu clarity
           'rgba(0, 0, 0, 0.6)',   // Dark
@@ -76,25 +80,40 @@ export default function App() {
         locations={[0, 0.2, 0.35, 0.5, 0.65, 0.75, 0.85, 0.92, 0.97, 1]}
         style={[styles.separateGradient, gradientStyle]}
         pointerEvents="none"
-      />
+        />
+      )}
 
       {/* Hero Header - On top of everything */}
-      <HeroHeader animationProgress={animationProgress} />
+      <HeroHeader
+        animationProgress={animationProgress}
+        isSettingsOpen={isSettingsOpen}
+      />
 
       {/* Secondary Toolbar - Shows when scrolling down */}
-      {!isHomePageOpen && <ScrollToolbar scrollDirection={scrollDirection} />}
+      {!isHomePageOpen && !isSettingsOpen && <ScrollToolbar scrollDirection={scrollDirection} />}
 
       {/* Bottom Navigation - Always visible, handles open/close */}
       <BottomNav
         scrollDirection={scrollDirection}
         isHomePageOpen={isHomePageOpen}
         onHomePress={() => setIsHomePageOpen(!isHomePageOpen)}
+        onSettingsPress={() => setIsSettingsOpen(!isSettingsOpen)}
+        onMediaPress={() => setIsSettingsOpen(false)}
+        activeTab={isSettingsOpen ? 'settings' : 'media'}
+        isRightHanded={isRightHanded}
       />
 
       {/* Home Page - Expands from bottom-left */}
       <HomePage
         isVisible={isHomePageOpen}
         onClose={() => setIsHomePageOpen(false)}
+      />
+
+      {/* Bucket Settings Page */}
+      <BucketSettings
+        isVisible={isSettingsOpen}
+        isRightHanded={isRightHanded}
+        onHandednessChange={setIsRightHanded}
       />
     </GestureHandlerRootView>
   );

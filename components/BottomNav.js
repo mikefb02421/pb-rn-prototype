@@ -1,5 +1,5 @@
 // BottomNav.js - Bottom Navigation Component
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -21,8 +21,15 @@ import * as Haptics from 'expo-haptics';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const BottomNav = ({ scrollDirection }) => {
-  const [activeTab, setActiveTab] = useState('media');
+const BottomNav = ({ scrollDirection, onHomePress, onSettingsPress, onMediaPress, activeTab: activeTabProp }) => {
+  const [activeTab, setActiveTab] = useState(activeTabProp || 'media');
+
+  // Update active tab when prop changes
+  useEffect(() => {
+    if (activeTabProp) {
+      setActiveTab(activeTabProp);
+    }
+  }, [activeTabProp]);
 
   // Animate bottom nav based on scroll direction
   const bottomNavStyle = useAnimatedStyle(() => {
@@ -44,7 +51,15 @@ const BottomNav = ({ scrollDirection }) => {
   // Handle tab press with haptic feedback
   const handleTabPress = (tabName) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setActiveTab(tabName);
+    if (tabName === 'home' && onHomePress) {
+      onHomePress();
+    } else if (tabName === 'settings' && onSettingsPress) {
+      onSettingsPress();
+    } else if (tabName === 'media' && onMediaPress) {
+      onMediaPress();
+    } else {
+      setActiveTab(tabName);
+    }
   };
 
   const handleAddPress = () => {

@@ -4,8 +4,10 @@
 1. `App.js` - Main entry point that combines everything
 2. `components/HeroHeader.js` - Hero header component (stable)
 3. `components/Gallery.js` - Photo grid component with scroll detection
-4. `components/BottomNav.js` - Bottom navigation with gradient overlay
+4. `components/BottomNavAlt.js` - Two-part navigation with separated home button
 5. `components/ScrollToolbar.js` - Secondary toolbar for scroll state
+6. `components/HomePageMask.js` - Full-screen HomePage with circular reveal animation
+7. `components/AnimationControls.js` - Bezier curve testing panel (disabled due to dependencies)
 
 ## How to Upload to Expo Snack:
 
@@ -28,12 +30,13 @@
 Add to package.json dependencies:
 ```json
 {
-  "expo-linear-gradient": "~13.0.2",
-  "react-native-reanimated": "~3.10.1",
-  "react-native-gesture-handler": "~2.16.1",
-  "@expo/vector-icons": "*",
-  "expo-blur": "~13.0.2",
-  "expo-haptics": "*"
+  "expo-linear-gradient": "~15.0.7",
+  "react-native-reanimated": "~4.1.0",
+  "react-native-gesture-handler": "~2.28.0",
+  "@expo/vector-icons": "^15.0.2",
+  "expo-blur": "~15.0.7",
+  "expo-haptics": "~15.0.7",
+  "@react-native-masked-view/masked-view": "0.3.2"
 }
 ```
 
@@ -44,6 +47,10 @@ Add to package.json dependencies:
 - **App.js orchestrates** - Import and combine all components here
 
 ## Latest Features:
+- **HomePage with circular reveal** - Full-screen overlay that expands from home button with custom bezier timing
+- **Two-part navigation system** - Split home button (z-index 1000) and main nav (z-index 101) for proper layering
+- **Animated shadows** - Home button gains elevation shadow when HomePage opens
+- **Icon transformation** - Home button becomes close button when HomePage is active
 - **Dual navigation system** - BottomNav and ScrollToolbar swap based on scroll
 - **Static gradient overlay** - Constant bottom gradient that doesn't animate
 - **Position-based hero** - Hero animates based on scroll position (0-300px)
@@ -61,9 +68,12 @@ Add to package.json dependencies:
 📁 Your Snack
 ├── App.js (imports and combines everything)
 ├── components/
-│   ├── HeroHeader.js (your finished hero)
-│   ├── Gallery.js (photo grid)
-│   └── BottomNav.js (you'll create this next)
+│   ├── HeroHeader.js (hero header with scroll animations)
+│   ├── Gallery.js (photo grid with scroll detection)
+│   ├── BottomNavAlt.js (two-part navigation system)
+│   ├── ScrollToolbar.js (secondary toolbar)
+│   ├── HomePageMask.js (circular reveal HomePage)
+│   └── AnimationControls.js (disabled - bezier testing)
 └── package.json
 ```
 

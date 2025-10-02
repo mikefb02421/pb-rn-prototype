@@ -2,7 +2,17 @@
 
 ## Latest Updates
 
-### HomePage with Circular Reveal Animation (Latest)
+### SVG Dependency Fix & Navigation Refinement (Latest)
+- **SVG conflict resolution** - Replaced SVG circular mask with animated View to eliminate RNSVGCircle registration conflicts
+- **Two-part navigation system** - Split navigation into separate containers with proper z-index layering
+- **Elevated home button** - Home button (z-index 1000) stays visible above HomePage (z-index 999) with animated shadow
+- **Icon transformation** - Home button changes to close icon when HomePage is active
+- **Animation controls framework** - Created AnimationControls component for real-time bezier curve testing (disabled due to slider dependency)
+- **Dependency cleanup** - Removed conflicting package-snack.json and unnecessary react-native-svg dependency
+- **Enhanced timing** - Custom bezier curve support with Easing.bezier() for precise animation control
+- **Hook optimization** - Fixed React Hook dependency warnings in useEffect calls
+
+### HomePage with Circular Reveal Animation
 - **Circular mask reveal** - True unmasking effect using react-native-masked-view
 - **Two-part navigation** - Separated home button into its own circular toolbar
 - **Activity feed** - HomePage shows activity from all user Buckets

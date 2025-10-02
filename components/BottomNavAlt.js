@@ -22,8 +22,8 @@ import * as Haptics from 'expo-haptics';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen }) => {
-  const [activeTab, setActiveTab] = useState('media');
+const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen, onSettingsPress, onMediaPress, activeTab: activeTabProp, isRightHanded }) => {
+  const [activeTab, setActiveTab] = useState(activeTabProp || 'media');
   const shadowOpacity = useSharedValue(0);
 
   // Animate shadow when HomePage opens/closes
@@ -74,11 +74,22 @@ const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen }) => {
     };
   });
 
+  // Update active tab when prop changes
+  useEffect(() => {
+    if (activeTabProp) {
+      setActiveTab(activeTabProp);
+    }
+  }, [activeTabProp]);
+
   // Handle tab press with haptic feedback
   const handleTabPress = (tabName) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (tabName === 'home' && onHomePress) {
       onHomePress();
+    } else if (tabName === 'settings' && onSettingsPress) {
+      onSettingsPress();
+    } else if (tabName === 'media' && onMediaPress) {
+      onMediaPress();
     } else {
       setActiveTab(tabName);
     }
@@ -89,7 +100,7 @@ const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen }) => {
     // Handle add action
   };
 
-  const NavItem = ({ name, iconName, IconComponent = Ionicons, size = 26 }) => {
+  const NavItem = ({ name, iconName, IconComponent = Ionicons, size = 24 }) => {
     const isActive = activeTab === name;
 
     return (
@@ -129,22 +140,25 @@ const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen }) => {
       />
 
       {/* Main navigation pill - lower z-index, gets covered by HomePage */}
-      <Animated.View style={[styles.mainNavContainer, bottomNavStyle]}>
+      <Animated.View style={[
+        styles.mainNavContainer,
+        isRightHanded ? styles.mainNavContainerRight : styles.mainNavContainerLeft,
+        bottomNavStyle
+      ]}>
         <BlurView intensity={80} tint="light" style={styles.mainBlurContainer}>
           <View style={styles.pillContainer}>
             <View style={styles.navItems}>
               {/* Media */}
-              <NavItem name="media" iconName="images-outline" size={26} />
+              <NavItem name="media" iconName="images-outline" />
 
               {/* Albums */}
               <NavItem
                 name="albums"
                 iconName="albums-outline"
-                size={26}
               />
 
               {/* Settings */}
-              <NavItem name="settings" iconName="settings-outline" size={26} />
+              <NavItem name="settings" iconName="settings-outline" />
 
               {/* Add Button - Special styling */}
               <TouchableOpacity
@@ -158,7 +172,7 @@ const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen }) => {
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                 >
-                  <Ionicons name="add" size={32} color="#FFFFFF" />
+                  <Ionicons name="add" size={28} color="#FFFFFF" />
                 </LinearGradient>
               </TouchableOpacity>
             </View>
@@ -167,7 +181,11 @@ const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen }) => {
       </Animated.View>
 
       {/* Home button - higher z-index, always visible above HomePage */}
-      <Animated.View style={[styles.homeButtonContainer, bottomNavStyle]}>
+      <Animated.View style={[
+        styles.homeButtonContainer,
+        isRightHanded ? styles.homeButtonContainerRight : styles.homeButtonContainerLeft,
+        bottomNavStyle
+      ]}>
         <BlurView intensity={80} tint="light" style={styles.homeBlurContainer}>
           <Animated.View style={[
             styles.homeContainer,
@@ -181,7 +199,7 @@ const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen }) => {
             >
               <Ionicons
                 name={isHomePageOpen ? "close" : "home"}
-                size={28}
+                size={24}
                 color={isHomePageOpen ? '#000000' : (activeTab === 'home' ? '#1C47CB' : '#8E8E93')}
               />
             </TouchableOpacity>
@@ -204,29 +222,40 @@ const styles = StyleSheet.create({
   mainNavContainer: {
     position: 'absolute',
     bottom: Platform.OS === 'ios' ? 34 : 20,
-    left: 104, // Space for home button (72px) + gap (12px) + padding (20px)
-    right: 20,
     zIndex: 101, // Below HomePage (999)
+  },
+  mainNavContainerLeft: {
+    left: 92, // Space for home button (60px) + gap (12px) + padding (20px)
+    right: 20,
+  },
+  mainNavContainerRight: {
+    left: 20,
+    right: 92, // Space for home button (60px) + gap (12px) + padding (20px)
   },
   homeButtonContainer: {
     position: 'absolute',
     bottom: Platform.OS === 'ios' ? 34 : 20,
-    left: 20,
     zIndex: 1000, // Above HomePage (999)
+  },
+  homeButtonContainerLeft: {
+    left: 20,
+  },
+  homeButtonContainerRight: {
+    right: 20,
   },
   // Home button styles
   homeBlurContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     overflow: 'hidden',
     marginRight: 12, // Gap between home and main pill
   },
   homeContainer: {
-    width: 72,
-    height: 72,
+    width: 60,
+    height: 60,
     backgroundColor: 'rgba(255, 255, 255, 0.98)',
-    borderRadius: 36,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
     // Base shadow
@@ -237,8 +266,8 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   homeButton: {
-    width: 72,
-    height: 72,
+    width: 60,
+    height: 60,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -250,14 +279,14 @@ const styles = StyleSheet.create({
   },
   // Main pill styles
   mainBlurContainer: {
-    borderRadius: 35,
+    borderRadius: 30,
     overflow: 'hidden',
   },
   pillContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.92)',
-    borderRadius: 35,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    borderRadius: 30,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
@@ -268,26 +297,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 48,
+    height: 44,
   },
   navItem: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 48,
+    height: 44,
     marginHorizontal: 2,
   },
   addButton: {
-    width: 56,
-    height: 48,
+    width: 52,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,
   },
   addButtonInner: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#1C47CB',
