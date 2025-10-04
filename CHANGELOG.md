@@ -2,7 +2,19 @@
 
 ## Latest Updates
 
-### Bucket Settings Page & Handedness Toggle (Latest)
+### HeroHeaderCover with Ken Burns Effect (Latest - v0.3.0)
+- **HeroHeaderCover Component** - New cinematic hero header replacing previous variants
+- **Ken Burns Effect** - Subtle 20-second animation cycles with 1.15x-1.25x zoom range
+- **Pan Animation** - Smooth ±25px horizontal, ±15px vertical movement with sine easing
+- **Header Overlay Tools** - Hamburger menu, home button, invite button, user avatars, title
+- **Combined Effects** - Ken Burns animation works seamlessly with overscroll zoom
+- **Overscroll Zoom** - Pull-to-zoom effect from 1.0x to 1.15x scale when scrolling past top
+- **Layout Improvements** - Container overflow handling prevents layout issues
+- **Optimized Sizing** - Title reduced to 36px, avatars to 32px, spacing to 8px for better proportions
+- **Scroll Direction Fix** - Fixed navigation state when returning to top of gallery
+- **Square Hero Format** - Full-width square hero image with proper aspect ratio
+
+### Bucket Settings Page & Handedness Toggle
 - **Bucket Settings page** - Full settings page with grouped cards layout matching Figma design
 - **Card grouping** - Sections use single white blocks with divider lines between items
 - **Handedness toggle** - Switch between left/right handed navigation layout in BottomNavAlt
