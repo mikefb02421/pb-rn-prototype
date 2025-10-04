@@ -17,7 +17,7 @@ import Animated, {
   Easing,
   Extrapolate,
 } from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+import { List, House, UserPlus } from 'phosphor-react-native';
 import * as Haptics from 'expo-haptics';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -142,7 +142,7 @@ const HeroHeaderCover = ({ overscroll }) => {
             onPress={() => handlePress('hamburger')}
             activeOpacity={0.7}
           >
-            <Ionicons name="menu" size={28} color="#FFFFFF" />
+            <List size={28} color="#FFFFFF" weight="fill" />
           </TouchableOpacity>
 
           {/* Home Button */}
@@ -151,7 +151,7 @@ const HeroHeaderCover = ({ overscroll }) => {
             onPress={() => handlePress('home')}
             activeOpacity={0.7}
           >
-            <Ionicons name="home" size={24} color="#FFFFFF" />
+            <House size={24} color="#FFFFFF" weight="fill" />
           </TouchableOpacity>
 
           {/* Invite Button */}
@@ -160,7 +160,7 @@ const HeroHeaderCover = ({ overscroll }) => {
             onPress={() => handlePress('add-user')}
             activeOpacity={0.7}
           >
-            <Ionicons name="person-add" size={18} color="#FFFFFF" />
+            <UserPlus size={18} color="#FFFFFF" weight="fill" />
           </TouchableOpacity>
         </View>
 
@@ -242,8 +242,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#1C47CB',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
