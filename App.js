@@ -3,7 +3,10 @@ import React from 'react';
 import {
   StyleSheet,
   StatusBar,
+  Dimensions,
 } from 'react-native';
+
+const { width: screenWidth } = Dimensions.get('window');
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -14,9 +17,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import components
-import HeroHeader from './components/HeroHeaderAlt';
+import HeroHeader from './components/HeroHeaderCover';
 import Gallery from './components/Gallery';
-import BottomNav from './components/BottomNavAlt';
+import BottomNav from './components/BottomNav';
 import ScrollToolbar from './components/ScrollToolbar';
 import HomePage from './components/HomePageMask';
 import BucketSettings from './components/BucketSettings';
@@ -35,6 +38,7 @@ export default function App() {
   // const [animationConfig, setAnimationConfig] = React.useState(null);
   const animationProgress = useSharedValue(0);
   const scrollDirection = useSharedValue(0); // For future bottom nav
+  const overscrollValue = useSharedValue(0); // For hero zoom effect
 
   // Gradient animation style - fades in when scrolled
   const gradientStyle = useAnimatedStyle(() => {
@@ -49,12 +53,15 @@ export default function App() {
   });
 
   // Handle scroll data from Gallery component
-  const handleScroll = ({ position, direction }) => {
+  const handleScroll = ({ position, direction, overscroll }) => {
     // Hero uses position-based animation (smooth gradient based on scroll position)
     animationProgress.value = position;
 
     // Store direction for future bottom nav component
     scrollDirection.value = direction;
+
+    // Store overscroll for hero zoom effect
+    overscrollValue.value = overscroll || 0;
   };
 
   return (
@@ -62,7 +69,7 @@ export default function App() {
       <StatusBar barStyle="light-content" />
 
       {/* Photo Gallery - Hidden when settings, collections, or home page is open */}
-      {!isSettingsOpen && !isCollectionsOpen && <Gallery onScroll={handleScroll} headerHeight={168} />}
+      {!isSettingsOpen && !isCollectionsOpen && <Gallery onScroll={handleScroll} headerHeight={screenWidth} />}
 
       {/* Gradient Overlay - Appears when scrolled, hidden when settings or collections is open */}
       {!isSettingsOpen && !isCollectionsOpen && (
@@ -89,6 +96,7 @@ export default function App() {
       <HeroHeader
         animationProgress={animationProgress}
         isSettingsOpen={isSettingsOpen || isCollectionsOpen}
+        overscroll={overscrollValue}
       />
 
       {/* Secondary Toolbar - Shows when scrolling down */}

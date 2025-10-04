@@ -32,10 +32,10 @@ const Gallery = ({ onScroll, headerHeight = 168 }) => {
   const previousScrollY = useSharedValue(0);
   const scrollDirection = useSharedValue(0); // -1 = up, 1 = down, 0 = no change
 
-  // Function to update parent with both position and direction
-  const updateParent = useCallback((position, direction) => {
+  // Function to update parent with position, direction, and overscroll
+  const updateParent = useCallback((position, direction, overscroll) => {
     if (onScroll) {
-      onScroll({ position, direction });
+      onScroll({ position, direction, overscroll });
     }
   }, [onScroll]);
 
@@ -44,7 +44,10 @@ const Gallery = ({ onScroll, headerHeight = 168 }) => {
     const contentSize = event.nativeEvent.contentSize.height;
     const layoutHeight = event.nativeEvent.layoutMeasurement.height;
 
-    if (currentY >= 0 && currentY < 5000) {
+    // Calculate overscroll (when scrolling above the top)
+    const overscrollValue = currentY < 0 ? Math.abs(currentY) : 0;
+
+    if (currentY >= -200 && currentY < 5000) { // Allow negative values for overscroll
       const prevY = previousScrollY.value;
       const deltaY = currentY - prevY;
 
@@ -57,7 +60,14 @@ const Gallery = ({ onScroll, headerHeight = 168 }) => {
 
       // Detect direction changes (for bottom nav)
       let directionValue = scrollDirection.value;
-      if (Math.abs(deltaY) > 2 && !isNearBottom) {
+
+      // Reset to idle when at the very top
+      if (currentY <= 5) {
+        if (scrollDirection.value !== 0) {
+          scrollDirection.value = 0;
+          directionValue = 0;
+        }
+      } else if (Math.abs(deltaY) > 2 && !isNearBottom) {
         const newDirection = deltaY > 0 ? 1 : -1; // 1 = down, -1 = up
         if (scrollDirection.value !== newDirection) {
           scrollDirection.value = newDirection;
@@ -65,8 +75,8 @@ const Gallery = ({ onScroll, headerHeight = 168 }) => {
         }
       }
 
-      // Send both values to parent
-      runOnJS(updateParent)(positionProgress, directionValue);
+      // Send position, direction, and overscroll to parent
+      runOnJS(updateParent)(positionProgress, directionValue, overscrollValue);
 
       previousScrollY.value = currentY;
     }
