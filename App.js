@@ -147,7 +147,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000', // Black background for photo gallery
+    backgroundColor: '#FFFFFF', // White background for photo gallery
   },
   separateGradient: {
     position: 'absolute',

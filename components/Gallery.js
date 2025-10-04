@@ -82,13 +82,25 @@ const Gallery = ({ onScroll, headerHeight = 168 }) => {
     }
   }, [updateParent, previousScrollY, scrollDirection]);
 
-  const renderImage = useCallback(({ item }) => {
+  const renderImage = useCallback(({ item, index }) => {
+    const column = index % 3;
+    const isRightColumn = column === 2;
+
     return (
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => console.log('Image pressed:', item.id)}
       >
-        <Image source={{ uri: item.uri }} style={styles.gridImage} />
+        <Image
+          source={{ uri: item.uri }}
+          style={[
+            styles.gridImage,
+            {
+              marginRight: isRightColumn ? 0 : 2,
+              marginBottom: 2
+            }
+          ]}
+        />
       </TouchableOpacity>
     );
   }, []);
@@ -96,7 +108,7 @@ const Gallery = ({ onScroll, headerHeight = 168 }) => {
   const keyExtractor = useCallback((item) => item.id, []);
 
   const headerComponent = useMemo(() => (
-    <View style={{ height: headerHeight }} />
+    <View style={{ height: headerHeight + 2 }} />
   ), [headerHeight]);
 
   const footerComponent = useMemo(() => (
@@ -127,10 +139,10 @@ const Gallery = ({ onScroll, headerHeight = 168 }) => {
 
 const styles = StyleSheet.create({
   gridContent: {
-    paddingHorizontal: 1,
+    backgroundColor: '#FFFFFF',
   },
   row: {
-    gap: 2,
+    // Removed gap - using individual margins instead
   },
   gridImage: {
     width: IMAGE_SIZE,
