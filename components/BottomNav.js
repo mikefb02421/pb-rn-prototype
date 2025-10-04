@@ -21,7 +21,7 @@ import * as Haptics from 'expo-haptics';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const BottomNav = ({ scrollDirection, onHomePress, onSettingsPress, onMediaPress, activeTab: activeTabProp }) => {
+const BottomNav = ({ scrollDirection, onHomePress, onSettingsPress, onMediaPress, onCollectionsPress, activeTab: activeTabProp }) => {
   const [activeTab, setActiveTab] = useState(activeTabProp || 'media');
 
   // Update active tab when prop changes
@@ -57,6 +57,8 @@ const BottomNav = ({ scrollDirection, onHomePress, onSettingsPress, onMediaPress
       onSettingsPress();
     } else if (tabName === 'media' && onMediaPress) {
       onMediaPress();
+    } else if (tabName === 'collections' && onCollectionsPress) {
+      onCollectionsPress();
     } else {
       setActiveTab(tabName);
     }
@@ -118,9 +120,9 @@ const BottomNav = ({ scrollDirection, onHomePress, onSettingsPress, onMediaPress
               {/* Media */}
               <NavItem name="media" iconName="images-outline" size={26} />
 
-              {/* Albums */}
+              {/* Collections */}
               <NavItem
-                name="albums"
+                name="collections"
                 iconName="albums-outline"
                 size={26}
               />

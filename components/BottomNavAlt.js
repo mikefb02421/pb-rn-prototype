@@ -22,7 +22,7 @@ import * as Haptics from 'expo-haptics';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen, onSettingsPress, onMediaPress, activeTab: activeTabProp, isRightHanded }) => {
+const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen, onSettingsPress, onMediaPress, onCollectionsPress, activeTab: activeTabProp, isRightHanded }) => {
   const [activeTab, setActiveTab] = useState(activeTabProp || 'media');
   const shadowOpacity = useSharedValue(0);
 
@@ -90,6 +90,8 @@ const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen, onSettings
       onSettingsPress();
     } else if (tabName === 'media' && onMediaPress) {
       onMediaPress();
+    } else if (tabName === 'collections' && onCollectionsPress) {
+      onCollectionsPress();
     } else {
       setActiveTab(tabName);
     }
@@ -147,13 +149,13 @@ const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen, onSettings
       ]}>
         <BlurView intensity={80} tint="light" style={styles.mainBlurContainer}>
           <View style={styles.pillContainer}>
-            <View style={styles.navItems}>
+            <View style={[styles.navItems, isRightHanded && styles.navItemsReversed]}>
               {/* Media */}
               <NavItem name="media" iconName="images-outline" />
 
-              {/* Albums */}
+              {/* Collections */}
               <NavItem
-                name="albums"
+                name="collections"
                 iconName="albums-outline"
               />
 
@@ -162,7 +164,7 @@ const BottomNavAlt = ({ scrollDirection, onHomePress, isHomePageOpen, onSettings
 
               {/* Add Button - Special styling */}
               <TouchableOpacity
-                style={styles.addButton}
+                style={[styles.addButton, isRightHanded && styles.addButtonReversed]}
                 onPress={handleAddPress}
                 activeOpacity={0.8}
               >
@@ -249,7 +251,6 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     overflow: 'hidden',
-    marginRight: 12, // Gap between home and main pill
   },
   homeContainer: {
     width: 60,
@@ -299,6 +300,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     height: 44,
   },
+  navItemsReversed: {
+    flexDirection: 'row-reverse',
+  },
   navItem: {
     flex: 1,
     alignItems: 'center',
@@ -312,6 +316,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,
+  },
+  addButtonReversed: {
+    marginLeft: 0,
+    marginRight: 8,
   },
   addButtonInner: {
     width: 42,

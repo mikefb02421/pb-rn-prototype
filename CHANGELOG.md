@@ -2,7 +2,17 @@
 
 ## Latest Updates
 
-### SVG Dependency Fix & Navigation Refinement (Latest)
+### Bucket Settings Page & Handedness Toggle (Latest)
+- **Bucket Settings page** - Full settings page with grouped cards layout matching Figma design
+- **Card grouping** - Sections use single white blocks with divider lines between items
+- **Handedness toggle** - Switch between left/right handed navigation layout in BottomNavAlt
+- **Dynamic layout** - Home button and main nav pill swap positions based on preference
+- **Navigation routing** - Settings gear icon opens settings, media icon returns to gallery
+- **Compact navigation** - Reduced bottom nav height from 72px to 60px for better proportions
+- **Consistent spacing** - 12px gap maintained between navigation elements in both modes
+- **Visual refinements** - 16px settings title, muted gray colors, improved touch targets
+
+### SVG Dependency Fix & Navigation Refinement
 - **SVG conflict resolution** - Replaced SVG circular mask with animated View to eliminate RNSVGCircle registration conflicts
 - **Two-part navigation system** - Split navigation into separate containers with proper z-index layering
 - **Elevated home button** - Home button (z-index 1000) stays visible above HomePage (z-index 999) with animated shadow

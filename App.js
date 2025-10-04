@@ -14,12 +14,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import components
-import HeroHeader from './components/HeroHeader';
+import HeroHeader from './components/HeroHeaderAlt';
 import Gallery from './components/Gallery';
 import BottomNav from './components/BottomNavAlt';
 import ScrollToolbar from './components/ScrollToolbar';
 import HomePage from './components/HomePageMask';
 import BucketSettings from './components/BucketSettings';
+import Collections from './components/Collections';
 // import AnimationControls from './components/AnimationControls';
 
 // Create animated version of LinearGradient
@@ -28,6 +29,7 @@ const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 export default function App() {
   const [isHomePageOpen, setIsHomePageOpen] = React.useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+  const [isCollectionsOpen, setIsCollectionsOpen] = React.useState(false);
   const [isRightHanded, setIsRightHanded] = React.useState(false); // Default is left-handed
   // const [showControls, setShowControls] = React.useState(false);
   // const [animationConfig, setAnimationConfig] = React.useState(null);
@@ -59,11 +61,11 @@ export default function App() {
     <GestureHandlerRootView style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      {/* Photo Gallery - Hidden when settings or home page is open */}
-      {!isSettingsOpen && <Gallery onScroll={handleScroll} headerHeight={168} />}
+      {/* Photo Gallery - Hidden when settings, collections, or home page is open */}
+      {!isSettingsOpen && !isCollectionsOpen && <Gallery onScroll={handleScroll} headerHeight={168} />}
 
-      {/* Gradient Overlay - Appears when scrolled, hidden when settings is open */}
-      {!isSettingsOpen && (
+      {/* Gradient Overlay - Appears when scrolled, hidden when settings or collections is open */}
+      {!isSettingsOpen && !isCollectionsOpen && (
         <AnimatedLinearGradient
         colors={[
           'rgba(0, 0, 0, 0.7)',  // Much darker at top for hamburger menu clarity
@@ -86,20 +88,30 @@ export default function App() {
       {/* Hero Header - On top of everything */}
       <HeroHeader
         animationProgress={animationProgress}
-        isSettingsOpen={isSettingsOpen}
+        isSettingsOpen={isSettingsOpen || isCollectionsOpen}
       />
 
       {/* Secondary Toolbar - Shows when scrolling down */}
-      {!isHomePageOpen && !isSettingsOpen && <ScrollToolbar scrollDirection={scrollDirection} />}
+      {!isHomePageOpen && !isSettingsOpen && !isCollectionsOpen && <ScrollToolbar scrollDirection={scrollDirection} />}
 
       {/* Bottom Navigation - Always visible, handles open/close */}
       <BottomNav
         scrollDirection={scrollDirection}
         isHomePageOpen={isHomePageOpen}
         onHomePress={() => setIsHomePageOpen(!isHomePageOpen)}
-        onSettingsPress={() => setIsSettingsOpen(!isSettingsOpen)}
-        onMediaPress={() => setIsSettingsOpen(false)}
-        activeTab={isSettingsOpen ? 'settings' : 'media'}
+        onSettingsPress={() => {
+          setIsSettingsOpen(!isSettingsOpen);
+          setIsCollectionsOpen(false);
+        }}
+        onMediaPress={() => {
+          setIsSettingsOpen(false);
+          setIsCollectionsOpen(false);
+        }}
+        onCollectionsPress={() => {
+          setIsCollectionsOpen(!isCollectionsOpen);
+          setIsSettingsOpen(false);
+        }}
+        activeTab={isSettingsOpen ? 'settings' : isCollectionsOpen ? 'collections' : 'media'}
         isRightHanded={isRightHanded}
       />
 
@@ -114,6 +126,11 @@ export default function App() {
         isVisible={isSettingsOpen}
         isRightHanded={isRightHanded}
         onHandednessChange={setIsRightHanded}
+      />
+
+      {/* Collections Page */}
+      <Collections
+        isVisible={isCollectionsOpen}
       />
     </GestureHandlerRootView>
   );

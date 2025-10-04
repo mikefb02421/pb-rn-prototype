@@ -42,46 +42,55 @@ const ScrollToolbar = ({ scrollDirection }) => {
 
   return (
     <Animated.View style={[styles.container, toolbarStyle]}>
-      <View style={styles.toolbar}>
-          {/* Left side buttons */}
-          <View style={styles.leftButtons}>
-            {/* Filter button */}
-            <TouchableOpacity
-              style={styles.iconButton}
-              onPress={() => handleButtonPress('filter')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="filter" size={22} color="#1C47CB" />
-            </TouchableOpacity>
+      {/* Search button - circular, positioned on far left */}
+      <BlurView intensity={80} tint="light" style={styles.searchBlurContainer}>
+        <TouchableOpacity
+          style={styles.searchButton}
+          onPress={() => handleButtonPress('search')}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="search" size={22} color="#1C47CB" />
+        </TouchableOpacity>
+      </BlurView>
 
-            {/* Sort button */}
-            <TouchableOpacity
-              style={styles.iconButton}
-              onPress={() => handleButtonPress('sort')}
-              activeOpacity={0.7}
-            >
-              <MaterialCommunityIcons name="sort" size={22} color="#1C47CB" />
-            </TouchableOpacity>
+      {/* Center - Filter/Sort/More buttons pill */}
+      <View style={styles.centerButtons}>
+        {/* Filter button */}
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => handleButtonPress('filter')}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="filter" size={22} color="#1C47CB" />
+        </TouchableOpacity>
 
-            {/* More options */}
-            <TouchableOpacity
-              style={styles.iconButton}
-              onPress={() => handleButtonPress('more')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="ellipsis-horizontal" size={22} color="#1C47CB" />
-            </TouchableOpacity>
-          </View>
+        {/* Sort button */}
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => handleButtonPress('sort')}
+          activeOpacity={0.7}
+        >
+          <MaterialCommunityIcons name="sort" size={22} color="#1C47CB" />
+        </TouchableOpacity>
 
-          {/* Right side - Select button */}
-          <TouchableOpacity
-            style={styles.selectButton}
-            onPress={() => handleButtonPress('select')}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.selectText}>Select</Text>
-          </TouchableOpacity>
+        {/* More options */}
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => handleButtonPress('more')}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="ellipsis-horizontal" size={22} color="#1C47CB" />
+        </TouchableOpacity>
       </View>
+
+      {/* Right side - Select button */}
+      <TouchableOpacity
+        style={styles.selectButton}
+        onPress={() => handleButtonPress('select')}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.selectText}>Select</Text>
+      </TouchableOpacity>
     </Animated.View>
   );
 };
@@ -90,24 +99,43 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     bottom: Platform.OS === 'ios' ? 34 : 20,
-    left: 16,
-    right: 16,
-    zIndex: 101, // Above gradient
-  },
-  toolbar: {
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'transparent',
+    zIndex: 101, // Above gradient
   },
-  leftButtons: {
+  // Search button styles
+  searchBlurContainer: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    overflow: 'hidden',
+    marginRight: 16, // Fixed 16px gap to center buttons
+  },
+  searchButton: {
+    width: 52,
+    height: 52,
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  // Center buttons (Filter/Sort/More) styles
+  centerButtons: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.92)',
     borderRadius: 26,
-    height: 52, // Increased to accommodate larger touch targets
+    height: 52,
     paddingHorizontal: 6,
-    marginRight: 44, // 44pt gap to select button
+    marginRight: 16, // Fixed 16px gap to select button
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

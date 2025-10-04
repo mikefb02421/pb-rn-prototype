@@ -148,12 +148,6 @@ const HomePageMask = ({ isVisible, onClose, animationConfig }) => {
   const maxRadius = calculateMaxRadius();
 
   useEffect(() => {
-    // Use custom bezier config if provided, otherwise use defaults
-    const closeConfig = animationConfig || {
-      x1: 0.33, y1: 1, x2: 0.68, y2: 1,
-      duration: 750
-    };
-
     if (isVisible) {
       // Animate in - circular reveal
       // Easing.inOut(Easing.quad) = even slower start/end with gentler curve
@@ -167,17 +161,17 @@ const HomePageMask = ({ isVisible, onClose, animationConfig }) => {
         easing: Easing.inOut(Easing.quad),
       });
     } else {
-      // Animate out - reverse circular reveal with custom bezier curve
+      // Animate out - reverse circular reveal with same timing as growth
       circleRadius.value = withTiming(0, {
-        duration: closeConfig.duration,
-        easing: Easing.bezier(closeConfig.x1, closeConfig.y1, closeConfig.x2, closeConfig.y2),
+        duration: 850, // Same duration as opening
+        easing: Easing.inOut(Easing.quad), // Same easing as opening
       });
       backdropOpacity.value = withTiming(0, {
-        duration: closeConfig.duration,
-        easing: Easing.bezier(closeConfig.x1, closeConfig.y1, closeConfig.x2, closeConfig.y2),
+        duration: 850, // Same duration as opening
+        easing: Easing.inOut(Easing.quad), // Same easing as opening
       });
     }
-  }, [isVisible, maxRadius, animationConfig, circleRadius, backdropOpacity]);
+  }, [isVisible, maxRadius, circleRadius, backdropOpacity]);
 
   // Backdrop animation
   const backdropStyle = useAnimatedStyle(() => ({
@@ -240,10 +234,7 @@ const HomePageMask = ({ isVisible, onClose, animationConfig }) => {
           <View style={styles.pageContent}>
             {/* Header */}
             <View style={styles.header}>
-              <View>
-                <Text style={styles.welcomeText}>Welcome back,</Text>
-                <Text style={styles.userName}>Mike</Text>
-              </View>
+              <Text style={styles.welcomeText}>Welcome back, Mike</Text>
             </View>
 
             {/* Activity Feed */}
@@ -252,7 +243,7 @@ const HomePageMask = ({ isVisible, onClose, animationConfig }) => {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.feedContent}
             >
-              <Text style={styles.sectionTitle}>Activity from your Buckets</Text>
+              <Text style={styles.sectionTitle}>Activity from all your Buckets</Text>
               {ACTIVITY_FEED.map((item) => (
                 <ActivityItem key={item.id} item={item} />
               ))}
@@ -292,8 +283,8 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -302,14 +293,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F0F0F0',
   },
   welcomeText: {
-    fontSize: 18,
-    color: '#8E8E93',
-    marginBottom: 4,
-  },
-  userName: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontSize: 24,
     color: '#000000',
+    fontWeight: '400',
+    textAlign: 'center',
   },
   feedContainer: {
     flex: 1,
@@ -319,9 +306,9 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#000000',
+    color: '#8E8E93',
     marginHorizontal: 20,
     marginBottom: 20,
   },
