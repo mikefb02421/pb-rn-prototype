@@ -2,7 +2,19 @@
 
 ## Latest Updates
 
-### HeroHeaderCover with Ken Burns Effect (Latest - v0.3.0)
+### Gallery Scroll Over Animation Complete (Latest - v0.4.0)
+- **Gallery Layering** - Gallery now scrolls over hero background with proper z-index layering
+- **TopToolbar Component** - New fixed top navigation with white circular buttons and Phosphor icons
+- **Scroll-Responsive Ken Burns** - Hero image zoom reverses as user scrolls (1.25x to 1.10x range)
+- **HomePage Dynamic Origins** - Circular reveal animation can originate from TopToolbar or BottomNav
+- **Local Moab Images** - Replaced Picsum placeholders with 28 custom Moab adventure photos
+- **Gallery Polish** - Added 2px border radius to thumbnails for subtle rounded corners
+- **Smart Backgrounds** - Transparent gallery with white background only where images appear
+- **Gradient Contrast** - Fixed gradient overlay z-index for optimal toolbar visibility
+- **HomePageMask Close Button** - Added circular X button in white bottom container
+- **Image Processing Pipeline** - Automated cropping and resizing with ImageMagick
+
+### HeroHeaderCover with Ken Burns Effect (v0.3.0)
 - **HeroHeaderCover Component** - New cinematic hero header replacing previous variants
 - **Ken Burns Effect** - Subtle 20-second animation cycles with 1.15x-1.25x zoom range
 - **Pan Animation** - Smooth ±25px horizontal, ±15px vertical movement with sine easing
