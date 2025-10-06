@@ -13,19 +13,56 @@ import { useSharedValue, runOnJS } from 'react-native-reanimated';
 const { width: screenWidth } = Dimensions.get('window');
 const IMAGE_SIZE = (screenWidth - 4) / 3;
 
-// Generate mountain biking themed images
-const generateMTBImages = () => {
+// Calculate where gallery should start (below title/avatars)
+const GALLERY_START_TOP = screenWidth;
+
+// Array of Moab images - explicit requires for Expo Snack compatibility
+const MOAB_IMAGES = [
+  require('../assets/dummy-moab-1.jpg'),
+  require('../assets/dummy-moab-2.jpg'),
+  require('../assets/dummy-moab-3.jpg'),
+  require('../assets/dummy-moab-4.jpg'),
+  require('../assets/dummy-moab-5.jpg'),
+  require('../assets/dummy-moab-6.jpg'),
+  require('../assets/dummy-moab-7.jpg'),
+  require('../assets/dummy-moab-8.jpg'),
+  require('../assets/dummy-moab-9.jpg'),
+  require('../assets/dummy-moab-10.jpg'),
+  require('../assets/dummy-moab-11.jpg'),
+  require('../assets/dummy-moab-12.jpg'),
+  require('../assets/dummy-moab-13.jpg'),
+  require('../assets/dummy-moab-14.jpg'),
+  require('../assets/dummy-moab-15.jpg'),
+  require('../assets/dummy-moab-16.jpg'),
+  require('../assets/dummy-moab-17.jpg'),
+  require('../assets/dummy-moab-18.jpg'),
+  require('../assets/dummy-moab-19.jpg'),
+  require('../assets/dummy-moab-20.jpg'),
+  require('../assets/dummy-moab-21.jpg'),
+  require('../assets/dummy-moab-22.jpg'),
+  require('../assets/dummy-moab-23.jpg'),
+  require('../assets/dummy-moab-24.jpg'),
+  require('../assets/dummy-moab-25.jpg'),
+  require('../assets/dummy-moab-26.jpg'),
+  require('../assets/dummy-moab-27.jpg'),
+  require('../assets/dummy-moab-28.jpg'),
+];
+
+// Generate Moab adventure images
+const generateMoabImages = () => {
   const images = [];
+  // Use your 28 Moab images, then repeat them to fill the gallery
   for (let i = 0; i < 100; i++) {
+    const imageIndex = i % MOAB_IMAGES.length; // Cycle through the images array
     images.push({
       id: i.toString(),
-      uri: `https://picsum.photos/400/400?random=${i}`,
+      uri: MOAB_IMAGES[imageIndex],
     });
   }
   return images;
 };
 
-const IMAGES_DATA = generateMTBImages();
+const IMAGES_DATA = generateMoabImages();
 
 const Gallery = ({ onScroll, headerHeight = 168 }) => {
   const flatListRef = useRef(null);
@@ -92,7 +129,7 @@ const Gallery = ({ onScroll, headerHeight = 168 }) => {
         onPress={() => console.log('Image pressed:', item.id)}
       >
         <Image
-          source={{ uri: item.uri }}
+          source={item.uri}
           style={[
             styles.gridImage,
             {
@@ -108,8 +145,21 @@ const Gallery = ({ onScroll, headerHeight = 168 }) => {
   const keyExtractor = useCallback((item) => item.id, []);
 
   const headerComponent = useMemo(() => (
-    <View style={{ height: headerHeight + 2 }} />
-  ), [headerHeight]);
+    <View>
+      {/* Transparent space for hero */}
+      <View style={{ height: GALLERY_START_TOP, backgroundColor: 'transparent' }} />
+      {/* White background starts here for images */}
+      <View style={{
+        position: 'absolute',
+        top: GALLERY_START_TOP,
+        left: 0,
+        right: 0,
+        bottom: -10000, // Extend far down
+        backgroundColor: '#FFFFFF',
+        zIndex: -1
+      }} />
+    </View>
+  ), []);
 
   const footerComponent = useMemo(() => (
     <View style={{ height: 100 }} />
@@ -133,13 +183,22 @@ const Gallery = ({ onScroll, headerHeight = 168 }) => {
       initialNumToRender={15}
       contentContainerStyle={styles.gridContent}
       columnWrapperStyle={styles.row}
+      style={[styles.gallery, { backgroundColor: 'transparent' }]}
     />
   );
 };
 
 const styles = StyleSheet.create({
+  gallery: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 10, // Above hero background, below top toolbar
+  },
   gridContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'transparent',
   },
   row: {
     // Removed gap - using individual margins instead
@@ -148,6 +207,7 @@ const styles = StyleSheet.create({
     width: IMAGE_SIZE,
     height: IMAGE_SIZE,
     backgroundColor: '#F2F2F7',
+    borderRadius: 2,
   },
 });
 

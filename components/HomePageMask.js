@@ -126,13 +126,13 @@ const ACTIVITY_FEED = [
   },
 ];
 
-const HomePageMask = ({ isVisible, onClose, animationConfig }) => {
+const HomePageMask = ({ isVisible, onClose, animationConfig, buttonPosition }) => {
   const circleRadius = useSharedValue(0);
   const backdropOpacity = useSharedValue(0);
 
-  // Calculate center point of home button (bottom-left)
-  const buttonCenterX = 56; // Center of 72px button with 20px padding
-  const buttonCenterY = screenHeight - (Platform.OS === 'ios' ? 70 : 56);
+  // Calculate center point of home button (dynamic or default to bottom-left)
+  const buttonCenterX = buttonPosition?.x || 56; // Default to BottomNavAlt position
+  const buttonCenterY = buttonPosition?.y || (screenHeight - (Platform.OS === 'ios' ? 70 : 56));
 
   // Calculate maximum radius needed to cover entire screen
   const calculateMaxRadius = () => {
@@ -248,6 +248,20 @@ const HomePageMask = ({ isVisible, onClose, animationConfig }) => {
                 <ActivityItem key={item.id} item={item} />
               ))}
             </ScrollView>
+
+            {/* Bottom Container for Close Button */}
+            <View style={styles.bottomContainer}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  onClose();
+                }}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="close" size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
           </View>
         </MaskedView>
       </Animated.View>
@@ -345,6 +359,27 @@ const styles = StyleSheet.create({
   activityTime: {
     fontSize: 13,
     color: '#8E8E93',
+  },
+  bottomContainer: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 20,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+  },
+  closeButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
 });
 

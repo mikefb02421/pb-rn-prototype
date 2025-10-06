@@ -29,7 +29,7 @@ const AVATARS = [
   { id: '3', type: 'image', uri: 'https://i.pravatar.cc/150?img=13' },
 ];
 
-const HeroHeaderCover = ({ overscroll }) => {
+const HeroHeaderCover = ({ overscroll, scrollProgress }) => {
   // Ken Burns effect animation values
   const kenBurnsProgress = useSharedValue(0);
 
@@ -47,13 +47,27 @@ const HeroHeaderCover = ({ overscroll }) => {
 
   // Animated styles for overscroll zoom effect combined with Ken Burns
   const imageStyle = useAnimatedStyle(() => {
-    // Ken Burns effect - slow zoom and pan
-    const kenBurnsScale = interpolate(
+    // Base Ken Burns effect - slow zoom and pan
+    const baseKenBurnsScale = interpolate(
       kenBurnsProgress.value,
       [0, 1],
-      [1.15, 1.25], // More subtle effect - 115% to 125%
+      [1.15, 1.25], // Base range 115% to 125%
       Extrapolate.CLAMP
     );
+
+    // Scroll-responsive zoom reversal
+    // When scrollProgress is provided, reverse the zoom effect
+    let kenBurnsScale = baseKenBurnsScale;
+    if (scrollProgress) {
+      const scrollInfluence = interpolate(
+        scrollProgress.value,
+        [0, 1], // Use full scroll range for responsive effect
+        [0, 0.15], // Reduce scale by up to 0.15 (from 1.25 down to 1.10 minimum)
+        Extrapolate.CLAMP
+      );
+      // Apply scroll influence to reduce the Ken Burns scale
+      kenBurnsScale = Math.max(1.10, baseKenBurnsScale - scrollInfluence);
+    }
 
     const kenBurnsTranslateX = interpolate(
       kenBurnsProgress.value,
@@ -127,54 +141,21 @@ const HeroHeaderCover = ({ overscroll }) => {
   return (
     <View style={styles.container}>
       <Animated.Image
-        source={{ uri: 'https://picsum.photos/800/800?random=1' }}
+        source={require('../assets/dummy-moab-2.jpg')}
         style={[styles.coverImage, imageStyle]}
         resizeMode="cover"
       />
 
-      {/* Header Overlay Content */}
-      <View style={styles.headerOverlay}>
-        {/* Top Row */}
-        <View style={styles.topRow}>
-          {/* Hamburger Menu */}
-          <TouchableOpacity
-            style={styles.hamburgerButton}
-            onPress={() => handlePress('hamburger')}
-            activeOpacity={0.7}
-          >
-            <List size={28} color="#FFFFFF" weight="fill" />
-          </TouchableOpacity>
+      {/* Title and Avatars - positioned at bottom of hero */}
+      <View style={styles.bottomSection}>
+        {/* Title */}
+        <Text style={styles.title}>MTB Crew!</Text>
 
-          {/* Home Button */}
-          <TouchableOpacity
-            style={styles.homeButton}
-            onPress={() => handlePress('home')}
-            activeOpacity={0.7}
-          >
-            <House size={24} color="#FFFFFF" weight="fill" />
-          </TouchableOpacity>
-
-          {/* Invite Button */}
-          <TouchableOpacity
-            style={styles.inviteButton}
-            onPress={() => handlePress('add-user')}
-            activeOpacity={0.7}
-          >
-            <UserPlus size={18} color="#FFFFFF" weight="fill" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Bottom Section - Title and Avatars */}
-        <View style={styles.bottomSection}>
-          {/* Title */}
-          <Text style={styles.title}>MTB Crew!</Text>
-
-          {/* Avatar Stack */}
-          <View style={styles.avatarStack}>
-            {AVATARS.map((avatar, index) => (
-              <Avatar key={avatar.id} avatar={avatar} index={index} />
-            ))}
-          </View>
+        {/* Avatar Stack */}
+        <View style={styles.avatarStack}>
+          {AVATARS.map((avatar, index) => (
+            <Avatar key={avatar.id} avatar={avatar} index={index} />
+          ))}
         </View>
       </View>
     </View>
@@ -188,65 +169,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: screenWidth,
-    zIndex: 10,
+    zIndex: 5, // Lower z-index - gallery will go on top
     overflow: 'hidden', // Prevent image from extending beyond container
   },
   coverImage: {
     width: '100%',
     height: '100%',
-  },
-  headerOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    justifyContent: 'space-between',
-  },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  // Hamburger menu
-  hamburgerButton: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    borderRadius: 22,
-  },
-  // Home button
-  homeButton: {
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#1C47CB',
-    borderRadius: 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  // Invite button
-  inviteButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#1C47CB',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
   },
   // Avatar stack
   avatarStack: {
@@ -269,7 +197,10 @@ const styles = StyleSheet.create({
   },
   // Bottom section
   bottomSection: {
-    alignSelf: 'flex-start',
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
   },
   title: {
     fontSize: 36,
